@@ -1,54 +1,40 @@
-# Rencana Integrasi Dashboard Guru SMP Kelas 7
+# Rencana Redesign Beranda Dashboard Guru Kelas 7
 
 ## Context
-Pengguna ingin membangun dashboard guru MIRAI berdasarkan komponen yang telah dikirimkan. Data profil yang diberikan adalah Guru Demo, guru Matematika di SMPN 1 Bandung. Pengguna menetapkan bahwa seluruh data dan konteks awal harus fokus pada SMP kelas 7, sehingga jadwal, shortcut, placeholder, dan informasi beranda tidak boleh menampilkan kelas VIII/IX.
+Beranda guru saat ini masih berupa hero sederhana, shortcut, dan daftar jadwal. Pengguna ingin tampilan awal dinaikkan kualitasnya agar mendekati referensi dashboard modern: top utility/search area, banner sambutan, kartu metrik, panel jadwal, progres pembelajaran, kalender, pengumuman, daftar kelas, dan akses cepat. Semua data tetap demo lokal dan dibatasi pada SMP kelas 7.
 
 ## Pendekatan yang direkomendasikan
-- Menambahkan route `/guru` yang merender shell `GuruDashboard` tanpa mengubah route home `/` dan admin `/admin`.
-- Menambahkan data profil guru ke `src/data/guruData.ts`, menggunakan `defaultProfileData` yang diberikan dan nilai kelas mengajar yang terbatas pada VII-A/VII-B/VII-C.
-- Menambahkan konfigurasi navigasi guru dari `navConfig.ts`; struktur menu tetap dapat memuat fitur yang belum dibangun, tetapi label/placeholder akan menunjukkan fitur dalam pengembangan.
-- Menambahkan komponen shell responsif: `Sidebar`, `Topbar`, `MobileDrawer`, dan `MobileBottomNav`, termasuk collapse sidebar desktop dan navigasi mobile.
-- Menggunakan `Beranda.tsx` yang sudah disesuaikan agar jadwal hanya VII-A, VII-B, VII-C, serta shortcut berorientasi kelas 7.
-- Menambahkan `ProfilGuru.tsx` untuk identitas, kepegawaian, pendidikan, data mengajar, dan sertifikasi dengan state frontend lokal.
-- Menambahkan `PlaceholderPage.tsx` untuk menu lain agar klik navigasi bekerja tanpa membuat fitur yang belum diminta.
-- Menambahkan token tema guru (`--mirai-*`) yang diperlukan komponen dan memakai token semantik yang sudah ada untuk warna tosca–kuning–coklat.
-- Tidak menambahkan backend, autentikasi baru, atau database; dashboard guru tahap ini adalah UI/state lokal.
+- Fokus perubahan pada `src/pages/guru/Beranda.tsx` dan style global yang diperlukan; sidebar, profil, dan route lain tetap dipertahankan.
+- Mengubah beranda menjadi dashboard grid responsif dengan hirarki visual seperti referensi, menggunakan kartu semantic `bg-card`, border, shadow, dan token tema MIRAI.
+- Menambahkan header konteks guru di area konten: pencarian siswa/materi, notifikasi sederhana, dan profil ringkas dari `defaultProfileData`, tanpa membuat backend pencarian.
+- Menambahkan banner sambutan bergradasi tosca–sapphire dengan copy khusus Guru Demo dan konteks kelas 7 SMP, tanpa aset ilustrasi eksternal baru.
+- Menambahkan empat metrik demo yang relevan untuk kelas 7: jumlah siswa, kelas diampu, tugas aktif, dan rata-rata nilai.
+- Menambahkan panel jadwal hari ini yang hanya berisi VII-A, VII-B, VII-C; panel progres pembelajaran; kalender bulan berjalan; pengumuman; serta kartu kelas VII-A/VII-B/VII-C.
+- Menambahkan akses cepat yang tetap memanggil `onNavigate`, sehingga interaksi menuju placeholder yang sudah tersedia tetap berfungsi.
+- Menjaga mobile layout satu kolom, tablet dua kolom, dan desktop grid asimetris; menghindari overflow horizontal.
 
-## File kritis yang akan dibuat/dimodifikasi
-- `src/pages/GuruDashboard.tsx`
-- `src/pages/guru/Beranda.tsx` (sudah ada dan dipertahankan dengan fokus kelas 7)
-- `src/pages/guru/ProfilGuru.tsx`
-- `src/pages/guru/PlaceholderPage.tsx`
-- `src/components/guru/Sidebar.tsx`
-- `src/components/guru/Topbar.tsx`
-- `src/components/guru/MobileDrawer.tsx`
-- `src/components/guru/MobileBottomNav.tsx`
-- `src/components/guru/navConfig.ts`
-- `src/data/guruData.ts`
-- `src/router.tsx`
-- `src/index.css` dan/atau `src/App.css` untuk token tema guru
+## File kritis
+- `src/pages/guru/Beranda.tsx`: struktur dashboard baru dan data demo kelas 7.
+- `src/data/guruData.ts`: sumber nama guru, mata pelajaran, kelas ampuh, dan identitas profil.
+- `src/index.css`: token tema yang sudah tersedia; hanya ditambah utilitas bila benar-benar diperlukan.
 
 ## Implementation checklist
-- [ ] Tambahkan `guruData.ts` dengan `ProfileData`, `defaultProfileData`, dan kelas mengajar hanya VII-A/VII-B/VII-C.
-- [ ] Tambahkan `navConfig.ts` beserta breadcrumb dan mobile bottom items.
-- [ ] Tambahkan `Sidebar` dengan collapse desktop, section labels, active state, dan navigasi keyboard.
-- [ ] Tambahkan `Topbar` dengan breadcrumb, toggle sidebar, dan akses Profil Guru.
-- [ ] Tambahkan `MobileDrawer` dan `MobileBottomNav` untuk breakpoint mobile.
-- [ ] Tambahkan `PlaceholderPage` untuk menu guru yang belum dibangun.
-- [ ] Tambahkan `ProfilGuru` dengan tab profil dan edit/simpan/batal state lokal.
-- [ ] Tambahkan `GuruDashboard` dengan active navigation, localStorage collapse state, footer profil, dan cleanup responsive drawer.
-- [ ] Tambahkan route `/guru` ke router sebelum catch-all.
-- [ ] Tambahkan token `--mirai-background`, `--mirai-sidebar`, `--mirai-accent`, `--mirai-cosmic`, `--mirai-mist`, dan `--mirai-success` bila belum tersedia.
-- [ ] Pastikan `Beranda` tetap hanya menampilkan jadwal dan shortcut kelas 7 SMP.
+- [ ] Tambahkan utility header beranda dengan search field demo, label guru, dan indikator notifikasi.
+- [ ] Ubah hero menjadi banner sambutan dengan konteks Guru Demo, Matematika, dan SMP kelas 7.
+- [ ] Tambahkan empat kartu statistik demo untuk siswa, kelas, tugas, dan nilai.
+- [ ] Tambahkan panel jadwal hari ini untuk VII-A/VII-B/VII-C dengan status selesai/aktif/akan datang.
+- [ ] Tambahkan panel progres pembelajaran berbasis mata pelajaran dan kelas 7.
+- [ ] Tambahkan kalender ringkas serta panel pengumuman sekolah.
+- [ ] Tambahkan daftar kartu kelas VII-A, VII-B, VII-C dengan jumlah siswa dan progres.
+- [ ] Tambahkan area akses cepat yang terhubung ke callback `onNavigate`.
+- [ ] Terapkan grid responsif dan state hover/focus yang konsisten dengan tema MIRAI.
+- [ ] Pastikan tidak ada data kelas VIII atau IX pada beranda baru.
 
 ## Verification checklist
-- [ ] Verifikasi `/guru` merender Beranda tanpa import error.
-- [ ] Verifikasi sidebar menampilkan menu dan section pada desktop serta collapse/expand bekerja.
-- [ ] Verifikasi drawer dan bottom navigation bekerja pada mobile.
-- [ ] Verifikasi Beranda hanya menampilkan VII-A, VII-B, VII-C dan tidak menampilkan VIII/IX.
-- [ ] Verifikasi Profil Guru dapat dibuka dari topbar dan edit/simpan/batal berjalan di state lokal.
-- [ ] Verifikasi semua menu lain membuka placeholder tanpa crash.
-- [ ] Verifikasi reload mempertahankan state collapse sidebar melalui localStorage.
-- [ ] Verifikasi footer menampilkan nama, kode guru, mata pelajaran, dan unit kerja dari `defaultProfileData`.
-- [ ] Verifikasi layout tidak mengalami overflow pada desktop dan mobile.
+- [ ] Verifikasi `/guru` menampilkan banner, statistik, jadwal, progres, kalender, pengumuman, kelas, dan akses cepat.
+- [ ] Verifikasi seluruh label kelas hanya VII-A, VII-B, VII-C atau konteks umum Kelas 7 SMP.
+- [ ] Verifikasi tombol jadwal, kelas, bank soal, dan akses cepat memanggil navigasi yang benar.
+- [ ] Verifikasi layout desktop mengikuti komposisi dashboard referensi tanpa panel saling tumpang tindih.
+- [ ] Verifikasi tablet/mobile menjadi satu kolom atau dua kolom yang terbaca tanpa scroll horizontal.
+- [ ] Verifikasi focus-visible pada tombol dan input pencarian.
 - [ ] Jalankan lint dan build proyek melalui workflow framework setelah implementasi.
