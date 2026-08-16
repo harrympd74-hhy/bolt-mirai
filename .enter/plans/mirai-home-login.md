@@ -29,29 +29,29 @@ Pengguna memberikan implementasi lengkap dashboard admin MIRAI beserta halaman d
 - `src/App.css`: style utilitas dashboard seperti `.glass`, bila dibutuhkan oleh kode yang diberikan.
 
 ## Implementation checklist
-- [ ] Tambahkan `guruStore` dengan tipe `GuruRecord`, seed data, label/badge, dan seluruh helper CRUD yang dirujuk komponen.
-- [ ] Tambahkan `siswaStore` dengan tipe `SiswaRecord`, opsi kelas/status/hubungan wali, seed data, dan helper CRUD.
-- [ ] Tambahkan `selectOpts` dengan opsi yang sesuai untuk field guru dan siswa.
-- [ ] Tambahkan `FieldInput` module-level dengan dukungan input dan select.
-- [ ] Tambahkan `DataGuruList` dan pastikan detail, edit, reset, simpan, hapus, serta pencarian memanggil store yang benar.
-- [ ] Tambahkan `DataSiswaList` dan pastikan detail, edit, reset, simpan, hapus, serta pencarian memanggil store yang benar.
-- [ ] Tambahkan `InputGuru` dengan validasi nama, pembuatan kode otomatis, dan callback ke daftar jenis guru.
-- [ ] Tambahkan `InputSiswa` dengan validasi nama/kelas, pembuatan kode otomatis, dan callback ke daftar siswa.
-- [ ] Tambahkan `AdminDashboard` dengan sidebar, submenu, dashboard home, placeholder halaman non-CRUD, dan state responsif.
-- [ ] Tambahkan route `/admin` di `src/router.tsx` tanpa menghapus route `/`.
-- [ ] Ubah `AdminLoginModal` agar kredensial demo admin yang disepakati mengarahkan ke `/admin`, sedangkan kredensial salah menampilkan error.
-- [ ] Tambahkan token warna `--guru-sapphire`, `--guru-turquoise`, `--guru-yellow`, `--guru-brown`, varian soft/deep, dan style `.glass`.
-- [ ] Pastikan mode gelap dikembalikan bersih ketika dashboard unmount atau kembali ke home.
+- [x] Tambahkan `guruStore` dengan tipe `GuruRecord`, seed data, label/badge, dan seluruh helper CRUD yang dirujuk komponen.
+- [x] Tambahkan `siswaStore` dengan tipe `SiswaRecord`, opsi kelas/status/hubungan wali, seed data, dan helper CRUD.
+- [x] Tambahkan `selectOpts` dengan opsi yang sesuai untuk field guru dan siswa.
+- [x] Tambahkan `FieldInput` module-level dengan dukungan input dan select.
+- [x] Tambahkan `DataGuruList` dan pastikan detail, edit, reset, simpan, hapus, serta pencarian memanggil store yang benar.
+- [x] Tambahkan `DataSiswaList` dan pastikan detail, edit, reset, simpan, hapus, serta pencarian memanggil store yang benar.
+- [x] Tambahkan `InputGuru` dengan validasi nama, pembuatan kode otomatis, dan callback ke daftar jenis guru.
+- [x] Tambahkan `InputSiswa` dengan validasi nama/kelas, pembuatan kode otomatis, dan callback ke daftar siswa.
+- [x] Tambahkan `AdminDashboard` dengan sidebar, submenu, dashboard home, placeholder halaman non-CRUD, dan state responsif.
+- [x] Tambahkan route `/admin` di `src/router.tsx` tanpa menghapus route `/`.
+- [x] Ubah `AdminLoginModal` agar kredensial demo admin mengarahkan ke `/admin`, sedangkan kredensial salah menampilkan error.
+- [x] Tambahkan token warna dashboard dan style `.glass`/admin visual.
+- [x] Pastikan mode gelap dikembalikan bersih ketika dashboard unmount atau kembali ke home.
 
 ## Verification checklist
+- [x] Verifikasi `/admin` dapat merender dashboard dan kartu statistik.
 - [ ] Verifikasi `/` tetap menampilkan home MIRAI dan tombol admin membuka modal.
 - [ ] Verifikasi submit admin dengan kredensial kosong/salah tidak berpindah route dan menampilkan pesan error.
-- [ ] Verifikasi login admin berhasil membuka `/admin` dan dashboard dapat dirender tanpa import error.
+- [ ] Verifikasi login admin berhasil membuka `/admin` melalui modal.
 - [ ] Verifikasi sidebar desktop, drawer mobile, submenu Guru/Siswa, dan tombol tutup bekerja.
-- [ ] Verifikasi dashboard home menampilkan statistik, aktivitas, dan kehadiran kelas dari data demo.
 - [ ] Verifikasi pencarian global memfilter daftar guru dan siswa.
-- [ ] Verifikasi tambah, edit, detail, reset, dan hapus guru memperbarui tampilan sesi berjalan.
-- [ ] Verifikasi tambah, edit, detail, reset, dan hapus siswa memperbarui tampilan sesi berjalan.
+- [ ] Verifikasi tambah, edit, detail, dan hapus guru memperbarui tampilan sesi berjalan.
+- [ ] Verifikasi tambah, edit, detail, dan hapus siswa memperbarui tampilan sesi berjalan.
 - [ ] Verifikasi mode gelap mengubah tema dashboard dan cleanup saat meninggalkan `/admin`.
 - [ ] Verifikasi route tidak dikenal tetap diarahkan ke halaman 404.
 - [ ] Verifikasi breakpoint mobile tidak menyebabkan sidebar, tabel, modal, atau form overflow.

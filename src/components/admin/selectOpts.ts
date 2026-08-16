@@ -1,0 +1,2 @@
+import { kelasOptions, statusOptions, hubunganWaliOptions } from "@/data/siswaStore";
+export const SELECT_OPTS:Record<string,string[]>={jenisGuru:["tetap","honor","magang"],jenisKelamin:["","Laki-laki","Perempuan"],agama:["","Islam","Kristen","Katolik","Hindu","Buddha"],statusPernikahan:["","Belum Menikah","Menikah"],statusSertifikasi:["Belum Sertifikasi","Dalam Proses","Sudah Sertifikasi"],kelas:["",...kelasOptions],hubunganWali:["",...hubunganWaliOptions],status:statusOptions};
