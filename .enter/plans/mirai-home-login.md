@@ -1,58 +1,54 @@
-# Rencana Integrasi Dashboard Login Admin MIRAI
+# Rencana Integrasi Dashboard Guru SMP Kelas 7
 
 ## Context
-Pengguna memberikan implementasi lengkap dashboard admin MIRAI beserta halaman daftar/input guru dan siswa, store data demo in-memory, serta komponen field input. Proyek saat ini baru memiliki halaman home/login MIRAI; route admin, komponen CRUD, store, dan opsi select belum tersedia. Target tahap ini adalah membuat login admin demo lokal yang membuka dashboard admin, tanpa database/backend.
+Pengguna ingin membangun dashboard guru MIRAI berdasarkan komponen yang telah dikirimkan. Data profil yang diberikan adalah Guru Demo, guru Matematika di SMPN 1 Bandung. Pengguna menetapkan bahwa seluruh data dan konteks awal harus fokus pada SMP kelas 7, sehingga jadwal, shortcut, placeholder, dan informasi beranda tidak boleh menampilkan kelas VIII/IX.
 
 ## Pendekatan yang direkomendasikan
-- Menambahkan route `/admin` yang merender `AdminDashboard`, sementara halaman `/` home MIRAI tetap dipertahankan.
-- Mengubah `AdminLoginModal` dari sekadar alert menjadi login demo lokal yang memvalidasi kredensial admin, menampilkan error/loading, lalu menavigasi ke `/admin` saat berhasil.
-- Menambahkan `AdminDashboard.tsx` berdasarkan kode dashboard yang diberikan, termasuk sidebar responsif, pencarian, dark mode, notifikasi, navigasi halaman, statistik, aktivitas, dan kehadiran kelas.
-- Menambahkan komponen data yang diberikan pengguna ke `src/components/admin/`: `DataGuruList`, `InputGuru`, `DataSiswaList`, `InputSiswa`, `FieldInput`, serta `selectOpts` yang dirujuk oleh `FieldInput` namun belum dikirim/tersedia.
-- Menambahkan store demo lokal ke `src/data/guruStore.ts` dan `src/data/siswaStore.ts`, menggunakan data awal serta fungsi CRUD yang diberikan pengguna. Data hanya hidup selama sesi browser dan tidak dianggap sebagai persistence backend.
-- Menambahkan token warna admin (`--guru-*`) ke stylesheet global agar seluruh kelas dashboard yang diberikan memiliki warna valid dan tetap konsisten dengan design system semantik.
-- Memisahkan dashboard sebagai halaman fokus aplikasi; tombol keluar mengembalikan pengguna ke `/` tanpa membuat autentikasi server.
-- Tidak membuat database, backend function, atau Enter Cloud pada tahap ini karena pengguna memilih dashboard demo lokal dengan state frontend.
+- Menambahkan route `/guru` yang merender shell `GuruDashboard` tanpa mengubah route home `/` dan admin `/admin`.
+- Menambahkan data profil guru ke `src/data/guruData.ts`, menggunakan `defaultProfileData` yang diberikan dan nilai kelas mengajar yang terbatas pada VII-A/VII-B/VII-C.
+- Menambahkan konfigurasi navigasi guru dari `navConfig.ts`; struktur menu tetap dapat memuat fitur yang belum dibangun, tetapi label/placeholder akan menunjukkan fitur dalam pengembangan.
+- Menambahkan komponen shell responsif: `Sidebar`, `Topbar`, `MobileDrawer`, dan `MobileBottomNav`, termasuk collapse sidebar desktop dan navigasi mobile.
+- Menggunakan `Beranda.tsx` yang sudah disesuaikan agar jadwal hanya VII-A, VII-B, VII-C, serta shortcut berorientasi kelas 7.
+- Menambahkan `ProfilGuru.tsx` untuk identitas, kepegawaian, pendidikan, data mengajar, dan sertifikasi dengan state frontend lokal.
+- Menambahkan `PlaceholderPage.tsx` untuk menu lain agar klik navigasi bekerja tanpa membuat fitur yang belum diminta.
+- Menambahkan token tema guru (`--mirai-*`) yang diperlukan komponen dan memakai token semantik yang sudah ada untuk warna tosca–kuning–coklat.
+- Tidak menambahkan backend, autentikasi baru, atau database; dashboard guru tahap ini adalah UI/state lokal.
 
-## File yang akan dibuat/dimodifikasi
-- `src/pages/AdminDashboard.tsx`: dashboard admin utama dari kode pengguna.
-- `src/components/admin/DataGuruList.tsx`: daftar/detail/edit/hapus guru.
-- `src/components/admin/InputGuru.tsx`: form input guru.
-- `src/components/admin/DataSiswaList.tsx`: daftar/detail/edit/hapus siswa.
-- `src/components/admin/InputSiswa.tsx`: form input siswa.
-- `src/components/admin/FieldInput.tsx`: field input reusable.
-- `src/components/admin/selectOpts.ts`: opsi select yang dibutuhkan oleh `FieldInput`.
-- `src/data/guruStore.ts`: tipe, seed demo, dan CRUD guru.
-- `src/data/siswaStore.ts`: tipe, seed demo, dan CRUD siswa.
-- `src/components/AdminLoginModal.tsx`: validasi demo dan navigasi ke `/admin`.
-- `src/router.tsx`: route `/admin` sebelum catch-all.
-- `src/index.css`: token warna dashboard `--guru-*` dan penyesuaian global yang diperlukan.
-- `src/App.css`: style utilitas dashboard seperti `.glass`, bila dibutuhkan oleh kode yang diberikan.
+## File kritis yang akan dibuat/dimodifikasi
+- `src/pages/GuruDashboard.tsx`
+- `src/pages/guru/Beranda.tsx` (sudah ada dan dipertahankan dengan fokus kelas 7)
+- `src/pages/guru/ProfilGuru.tsx`
+- `src/pages/guru/PlaceholderPage.tsx`
+- `src/components/guru/Sidebar.tsx`
+- `src/components/guru/Topbar.tsx`
+- `src/components/guru/MobileDrawer.tsx`
+- `src/components/guru/MobileBottomNav.tsx`
+- `src/components/guru/navConfig.ts`
+- `src/data/guruData.ts`
+- `src/router.tsx`
+- `src/index.css` dan/atau `src/App.css` untuk token tema guru
 
 ## Implementation checklist
-- [x] Tambahkan `guruStore` dengan tipe `GuruRecord`, seed data, label/badge, dan seluruh helper CRUD yang dirujuk komponen.
-- [x] Tambahkan `siswaStore` dengan tipe `SiswaRecord`, opsi kelas/status/hubungan wali, seed data, dan helper CRUD.
-- [x] Tambahkan `selectOpts` dengan opsi yang sesuai untuk field guru dan siswa.
-- [x] Tambahkan `FieldInput` module-level dengan dukungan input dan select.
-- [x] Tambahkan `DataGuruList` dan pastikan detail, edit, reset, simpan, hapus, serta pencarian memanggil store yang benar.
-- [x] Tambahkan `DataSiswaList` dan pastikan detail, edit, reset, simpan, hapus, serta pencarian memanggil store yang benar.
-- [x] Tambahkan `InputGuru` dengan validasi nama, pembuatan kode otomatis, dan callback ke daftar jenis guru.
-- [x] Tambahkan `InputSiswa` dengan validasi nama/kelas, pembuatan kode otomatis, dan callback ke daftar siswa.
-- [x] Tambahkan `AdminDashboard` dengan sidebar, submenu, dashboard home, placeholder halaman non-CRUD, dan state responsif.
-- [x] Tambahkan route `/admin` di `src/router.tsx` tanpa menghapus route `/`.
-- [x] Ubah `AdminLoginModal` agar kredensial demo admin mengarahkan ke `/admin`, sedangkan kredensial salah menampilkan error.
-- [x] Tambahkan token warna dashboard dan style `.glass`/admin visual.
-- [x] Pastikan mode gelap dikembalikan bersih ketika dashboard unmount atau kembali ke home.
+- [ ] Tambahkan `guruData.ts` dengan `ProfileData`, `defaultProfileData`, dan kelas mengajar hanya VII-A/VII-B/VII-C.
+- [ ] Tambahkan `navConfig.ts` beserta breadcrumb dan mobile bottom items.
+- [ ] Tambahkan `Sidebar` dengan collapse desktop, section labels, active state, dan navigasi keyboard.
+- [ ] Tambahkan `Topbar` dengan breadcrumb, toggle sidebar, dan akses Profil Guru.
+- [ ] Tambahkan `MobileDrawer` dan `MobileBottomNav` untuk breakpoint mobile.
+- [ ] Tambahkan `PlaceholderPage` untuk menu guru yang belum dibangun.
+- [ ] Tambahkan `ProfilGuru` dengan tab profil dan edit/simpan/batal state lokal.
+- [ ] Tambahkan `GuruDashboard` dengan active navigation, localStorage collapse state, footer profil, dan cleanup responsive drawer.
+- [ ] Tambahkan route `/guru` ke router sebelum catch-all.
+- [ ] Tambahkan token `--mirai-background`, `--mirai-sidebar`, `--mirai-accent`, `--mirai-cosmic`, `--mirai-mist`, dan `--mirai-success` bila belum tersedia.
+- [ ] Pastikan `Beranda` tetap hanya menampilkan jadwal dan shortcut kelas 7 SMP.
 
 ## Verification checklist
-- [x] Verifikasi `/admin` dapat merender dashboard dan kartu statistik.
-- [ ] Verifikasi `/` tetap menampilkan home MIRAI dan tombol admin membuka modal.
-- [ ] Verifikasi submit admin dengan kredensial kosong/salah tidak berpindah route dan menampilkan pesan error.
-- [ ] Verifikasi login admin berhasil membuka `/admin` melalui modal.
-- [ ] Verifikasi sidebar desktop, drawer mobile, submenu Guru/Siswa, dan tombol tutup bekerja.
-- [ ] Verifikasi pencarian global memfilter daftar guru dan siswa.
-- [ ] Verifikasi tambah, edit, detail, dan hapus guru memperbarui tampilan sesi berjalan.
-- [ ] Verifikasi tambah, edit, detail, dan hapus siswa memperbarui tampilan sesi berjalan.
-- [ ] Verifikasi mode gelap mengubah tema dashboard dan cleanup saat meninggalkan `/admin`.
-- [ ] Verifikasi route tidak dikenal tetap diarahkan ke halaman 404.
-- [ ] Verifikasi breakpoint mobile tidak menyebabkan sidebar, tabel, modal, atau form overflow.
+- [ ] Verifikasi `/guru` merender Beranda tanpa import error.
+- [ ] Verifikasi sidebar menampilkan menu dan section pada desktop serta collapse/expand bekerja.
+- [ ] Verifikasi drawer dan bottom navigation bekerja pada mobile.
+- [ ] Verifikasi Beranda hanya menampilkan VII-A, VII-B, VII-C dan tidak menampilkan VIII/IX.
+- [ ] Verifikasi Profil Guru dapat dibuka dari topbar dan edit/simpan/batal berjalan di state lokal.
+- [ ] Verifikasi semua menu lain membuka placeholder tanpa crash.
+- [ ] Verifikasi reload mempertahankan state collapse sidebar melalui localStorage.
+- [ ] Verifikasi footer menampilkan nama, kode guru, mata pelajaran, dan unit kerja dari `defaultProfileData`.
+- [ ] Verifikasi layout tidak mengalami overflow pada desktop dan mobile.
 - [ ] Jalankan lint dan build proyek melalui workflow framework setelah implementasi.
