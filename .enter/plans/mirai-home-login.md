@@ -1,43 +1,46 @@
 # Rencana Implementasi Dasbor Home Login MIRAI
 
 ## Context
-Pengguna ingin membangun halaman home/login berdasarkan desain referensi yang diberikan. Struktur visual yang harus dipertahankan adalah layar pemilihan peran MIRAI: branding dan informasi tim riset di sisi kiri, empat pilihan peran di sisi kanan, latar pastel bertekstur lembut, serta tombol akses/keamanan di sudut kanan bawah. Implementasi akan disesuaikan dengan file kode yang akan dikirimkan pengguna berikutnya.
+Pengguna ingin mengganti halaman awal template menjadi home/login MIRAI berdasarkan desain referensi: branding dan informasi tim riset di kiri, empat pilihan peran di kanan, latar pastel bertekstur lembut, serta akses admin di sudut kanan bawah. Pengguna telah memberikan implementasi `HomeLogin` sebagai acuan perilaku dan visual. Scope saat ini hanya tampilan serta interaksi home/login; dashboard/rute `/guru` dan `/siswa` tidak dibuat pada tahap ini. Validasi username/password tetap memakai kredensial demo lokal untuk sementara.
 
 ## Pendekatan yang direkomendasikan
-- Meninjau file halaman utama, stylesheet global, konfigurasi Tailwind, serta aset yang tersedia sebelum menyentuh kode.
-- Memecah halaman menjadi komponen terfokus: latar dekoratif, blok branding/tim riset, kartu pilihan peran, dan kontrol akses.
-- Menggunakan token desain semantik pada `src/index.css` dan kelas Tailwind yang sudah tersedia; tidak menanamkan warna langsung secara tersebar di komponen.
-- Menyesuaikan aset logo, foto tim, dan ilustrasi peran dari file yang pengguna kirimkan atau aset proyek yang telah tersedia; tidak membuat data backend palsu.
-- Menambahkan interaksi pemilihan peran yang nyata sesuai routing/alur aplikasi yang sudah ada, tanpa mengubah bagian aplikasi di luar kebutuhan halaman home/login.
-- Menjaga komposisi desktop seperti referensi, lalu menyediakan responsivitas mobile dengan susunan vertikal yang tetap mempertahankan hierarki informasi.
-- Menambahkan animasi masuk bertahap dan state hover/focus yang halus, dengan dukungan keyboard dan kontras yang memadai.
+- Mengganti isi `src/pages/Index.tsx` dengan halaman MIRAI yang mengadopsi struktur `HomeLogin` yang dikirim pengguna.
+- Mempertahankan aset publik URL yang sudah ditentukan pengguna untuk logo, tim riset, dan ilustrasi peran, dengan `alt` text serta `crossOrigin` pada gambar eksternal.
+- Menjadikan daftar peran sebagai konfigurasi terstruktur agar kartu Guru, Siswa, Orang Tua, dan Tamu konsisten serta mudah dirawat.
+- Mempertahankan modal login peran, toggle visibilitas password, checkbox ingat saya, state loading, dan pesan error demo lokal dari kode acuan.
+- Tidak membuat dashboard atau rute baru. Jika navigasi demo berhasil menuju rute yang belum tersedia, perilaku tersebut akan dicatat/ditangani secara minimal tanpa memperluas scope halaman.
+- Karena `AdminLoginModal` belum ditemukan di proyek, menambahkan implementasi modal admin minimal hanya bila tombol admin tetap dipertahankan; komponen ini tidak akan membuat dashboard admin.
+- Memindahkan dekorasi latar dan gaya berulang ke token/stylesheet global seperlunya, sambil menghindari perubahan pada komponen UI shadcn yang tidak terkait.
+- Menambahkan aksesibilitas dasar: kartu peran dapat diakses keyboard, tombol memiliki label, modal dapat ditutup, input memiliki label, dan animasi menghormati `prefers-reduced-motion` bila diperlukan.
+- Menjaga responsivitas: komposisi dua kolom pada desktop dan susunan vertikal pada layar kecil tanpa overflow horizontal.
 
-## File kritis yang akan ditinjau/kemungkinan dimodifikasi
-- `src/pages/Index.tsx` atau halaman home/login aktif
-- `src/App.tsx` dan `src/router.tsx` untuk alur navigasi
-- `src/index.css` dan `src/App.css` untuk token, latar, responsivitas, serta animasi
-- `tailwind.config.ts` bila diperlukan untuk token atau font
-- Direktori aset `public/` atau aset yang akan dikirimkan pengguna
-- Komponen UI terkait tombol/kartu bila dapat digunakan kembali
+## File kritis yang ditinjau dan kemungkinan dimodifikasi
+- `src/pages/Index.tsx`: entry point yang saat ini masih berupa template sederhana; menjadi halaman MIRAI.
+- `src/index.css`: token dasar, reset, dan aturan global bila diperlukan untuk tampilan pastel.
+- `src/App.css`: aturan template lama akan dibersihkan atau disesuaikan agar tidak membatasi `#root` pada lebar 1280px.
+- `src/components/AdminLoginModal.tsx`: dibuat hanya jika tombol admin dipertahankan dan komponen memang belum tersedia.
+- `src/router.tsx`: tidak menambah rute dashboard pada scope ini; hanya diperiksa untuk memastikan halaman home tetap menjadi `/`.
+- `package.json`: tidak menambah dependency karena `framer-motion` dan `lucide-react` sudah tersedia.
 
 ## Implementation checklist
-- [ ] Identifikasi entry point home/login dan alur navigasi peran dari file kode yang dikirimkan.
-- [ ] Inventarisasi aset logo, foto tim riset, dan ilustrasi empat peran.
-- [ ] Implementasikan struktur layout MIRAI dengan area kiri dan kanan yang jelas.
-- [ ] Implementasikan latar pastel berlapis beserta elemen dekoratif tanpa mengganggu keterbacaan.
-- [ ] Implementasikan kartu Guru, Siswa, Orang Tua, dan Tamu sebagai komponen/data konfigurasi yang dapat dipelihara.
-- [ ] Hubungkan aksi kartu peran ke routing atau callback aplikasi yang sudah ada.
-- [ ] Tambahkan state hover, focus-visible, selected, dan animasi masuk yang tidak menghalangi aksesibilitas.
-- [ ] Pastikan layout tetap usable pada ukuran tablet dan mobile.
+- [ ] Ganti template `Index` menjadi halaman home/login MIRAI dengan pembagian layout kiri/kanan.
+- [ ] Tambahkan latar gradient mesh, grid lembut, lingkaran dekoratif, dan titik animasi sesuai referensi.
+- [ ] Tambahkan logo, judul MIRAI, tagline, dan blok empat anggota tim riset menggunakan aset yang diberikan.
+- [ ] Tambahkan empat kartu peran dengan konfigurasi judul, deskripsi, warna aksen, gambar, dan role key.
+- [ ] Tambahkan modal login peran dengan kredensial demo lokal yang dipertahankan dari kode acuan.
+- [ ] Tambahkan toggle password, remember-me, loading, error login, penutupan modal, dan navigasi demo yang sudah ada tanpa membuat dashboard baru.
+- [ ] Tambahkan atau sesuaikan modal admin minimal jika tombol admin dipertahankan; jangan menambahkan rute admin.
+- [ ] Hilangkan batasan CSS template yang menyebabkan `#root` tidak memenuhi viewport.
+- [ ] Pastikan interaksi kartu peran, modal, dan tombol admin dapat digunakan dengan keyboard.
+- [ ] Pastikan layout desktop, tablet, dan mobile tidak mengalami overflow horizontal.
 
 ## Verification checklist
-- [ ] Verifikasi tampilan desktop terhadap referensi: hierarki kiri/kanan, ukuran kartu, jarak, dan nuansa pastel.
-- [ ] Verifikasi setiap kartu peran dapat difokuskan dengan keyboard dan memiliki label yang jelas.
-- [ ] Verifikasi state awal tanpa peran terpilih tetap tampil benar.
-- [ ] Verifikasi klik masing-masing peran menuju target navigasi atau callback yang benar.
-- [ ] Verifikasi breakpoint mobile tidak menyebabkan overflow horizontal atau kartu bertumpuk secara tidak terbaca.
-- [ ] Verifikasi kontras teks, focus ring, dan alt text aset.
-- [ ] Jalankan pemeriksaan lint dan build proyek melalui workflow framework setelah implementasi disetujui.
-
-## Input yang masih diperlukan
-Kirimkan file kode halaman home/login beserta aset atau nama file aset yang ingin dipakai. Setelah itu rencana ini akan disesuaikan dengan struktur proyek aktual sebelum implementasi dimulai.
+- [ ] Verifikasi state awal `/` menampilkan seluruh branding, tim riset, empat peran, latar, dan tombol admin.
+- [ ] Verifikasi klik dan keyboard activation pada masing-masing kartu membuka modal dengan role yang benar.
+- [ ] Verifikasi submit dengan kredensial demo benar/salah menampilkan loading dan pesan error yang sesuai.
+- [ ] Verifikasi toggle password, tombol tutup, klik backdrop, dan tombol lupa password tidak menyebabkan crash.
+- [ ] Verifikasi tombol Guru/Siswa tidak mengharuskan dashboard baru dibuat dalam scope ini dan tidak merusak halaman home.
+- [ ] Verifikasi tombol admin membuka/menutup modal minimal bila komponen tersebut diimplementasikan.
+- [ ] Verifikasi gambar memiliki alt text, kontrol memiliki label, dan focus-visible terlihat.
+- [ ] Verifikasi breakpoint mobile tidak memotong nama, kartu, modal, atau menyebabkan scroll horizontal.
+- [ ] Jalankan lint dan build melalui workflow framework setelah implementasi disetujui.
