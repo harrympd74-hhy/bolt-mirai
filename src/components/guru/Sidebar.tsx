@@ -1,3 +1,48 @@
-import { ChevronLeft, ChevronRight } from "lucide-react";
+import { ChevronRight } from "lucide-react";
 import { navItems } from "./navConfig";
-export default function Sidebar({activeItem,onNavigate,collapsed,onToggleCollapse}:{activeItem:string;onNavigate:(id:string)=>void;collapsed:boolean;onToggleCollapse:()=>void}){return <aside className="flex h-full flex-col overflow-hidden border-r border-white/10 transition-all duration-300" style={{width:collapsed?64:272,minWidth:collapsed?64:272,background:"hsl(var(--mirai-sidebar))"}}><div className="flex shrink-0 items-center gap-3 border-b border-white/10 px-4 py-4"><div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-lg border border-white/25 bg-white/15 text-xs font-black text-white">M</div>{!collapsed&&<span className="select-none text-lg font-black tracking-widest text-white">MIRAI</span>}</div><nav className="scrollbar-thin flex-1 overflow-y-auto py-3">{navItems.filter(item=>item.id!=="profil-guru").map(item=>{const Icon=item.icon;const active=activeItem===item.id;return <div key={item.id}>{item.section&&!collapsed&&<p className="px-4 pb-1 pt-4 text-[10px] font-bold uppercase tracking-widest text-white/45">{item.section}</p>}{item.section&&collapsed&&<div className="mx-3 my-2 border-t border-white/10"/>}<button type="button" onClick={()=>onNavigate(item.id)} title={collapsed?item.label:undefined} className={`group relative flex w-full items-center gap-3 border-l-2 px-4 py-2.5 text-left text-sm transition ${active?"border-white bg-white/15 text-white":"border-transparent text-white/75 hover:bg-white/10 hover:text-white"}`}><Icon size={16} className="shrink-0"/>{!collapsed&&<span className="truncate font-medium">{item.label}</span>}{collapsed&&<span className="pointer-events-none absolute left-full z-50 ml-2 whitespace-nowrap rounded bg-slate-950 px-2 py-1 text-xs text-white opacity-0 shadow group-hover:opacity-100">{item.label}</span>}</button></div>})}</nav><div className="shrink-0 border-t border-white/10 p-2"><button type="button" onClick={onToggleCollapse} className="flex w-full items-center justify-center gap-2 rounded-lg py-2 text-xs text-white/70 transition hover:bg-white/10 hover:text-white">{collapsed?<ChevronRight size={16}/>:<ChevronLeft size={16}/>} {!collapsed&&<span>Sembunyikan</span>}</button></div></aside>}
+
+const logoUrl = "https://grazia-prod.oss-ap-southeast-1.aliyuncs.com/resources/uid_100050201/03d27ec3-8a8f-4d.png";
+
+interface SidebarProps {
+  activeItem: string;
+  onNavigate: (id: string) => void;
+  collapsed: boolean;
+  onToggleCollapse: () => void;
+}
+
+export default function Sidebar({ activeItem, onNavigate, collapsed }: SidebarProps) {
+  return (
+    <aside
+      className="guru-sidebar flex h-full flex-col overflow-hidden transition-[width,min-width] duration-300"
+      style={{ width: collapsed ? 76 : 280, minWidth: collapsed ? 76 : 280 }}
+    >
+      <div className={`guru-sidebar-header flex shrink-0 items-center border-b border-white/10 ${collapsed ? "justify-center px-3" : "gap-3 px-5"}`}>
+        <div className="guru-logo-shell shrink-0">
+          <img src={logoUrl} alt="Logo UPI" className="h-full w-full object-contain" crossOrigin="anonymous" />
+        </div>
+        {!collapsed && <div className="min-w-0"><p className="truncate text-lg font-black tracking-[0.18em] text-white">MIRAI</p><p className="text-[10px] font-medium tracking-wide text-white/50">DASHBOARD GURU</p></div>}
+      </div>
+
+      <nav className="guru-sidebar-nav scrollbar-thin flex-1 overflow-y-auto px-3 py-4">
+        {navItems.filter((item) => item.id !== "profil-guru").map((item) => {
+          const Icon = item.icon;
+          const active = activeItem === item.id;
+          return <div key={item.id}>
+            {item.section && !collapsed && <p className="px-3 pb-2 pt-5 text-[10px] font-bold uppercase tracking-[0.18em] text-[hsl(var(--guru-yellow))]">{item.section}</p>}
+            {item.section && collapsed && <div className="mx-2 my-3 border-t border-white/10" />}
+            <button type="button" onClick={() => onNavigate(item.id)} title={collapsed ? item.label : undefined} className={`guru-nav-item group relative ${collapsed ? "justify-center px-0" : "px-3"} ${active ? "guru-nav-item-active" : ""}`}>
+              <Icon size={17} className="shrink-0" />
+              {!collapsed && <span className="truncate font-medium">{item.label}</span>}
+              {collapsed && <span className="pointer-events-none absolute left-full z-50 ml-3 whitespace-nowrap rounded-lg bg-slate-950 px-3 py-2 text-xs text-white opacity-0 shadow-xl transition group-hover:opacity-100">{item.label}</span>}
+            </button>
+          </div>;
+        })}
+      </nav>
+
+      <div className={`border-t border-white/10 px-3 py-3 ${collapsed ? "text-center" : ""}`}>
+        {!collapsed && <p className="px-2 text-[10px] leading-relaxed text-white/40">Ruang kerja pembelajaran<br />SMP Kelas 7</p>}
+        {collapsed && <ChevronRight className="mx-auto h-4 w-4 text-white/35" aria-hidden="true" />}
+      </div>
+    </aside>
+  );
+}

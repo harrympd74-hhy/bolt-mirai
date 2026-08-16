@@ -162,5 +162,12 @@
   background: hsl(var(--card) / 0.88);
   backdrop-filter: blur(12px);
 }
-@media (max-width: 1023px) { .mirai-page { overflow-y: auto; } .mirai-ring-two { right: 1.5rem; bottom: 2rem; } }
+.guru-sidebar { background: linear-gradient(180deg, hsl(var(--mirai-sidebar)) 0%, hsl(195 70% 15%) 100%); color: hsl(210 40% 98%); }
+.guru-sidebar-header { min-height: 78px; }
+.guru-logo-shell { width: 42px; height: 42px; padding: 4px; border: 1px solid rgb(255 255 255 / 0.28); border-radius: 12px; background: hsl(var(--card)); box-shadow: 0 8px 20px rgb(0 0 0 / 0.18); }
+.guru-sidebar-nav { scrollbar-color: rgb(255 255 255 / 0.2) transparent; }
+.guru-nav-item { display: flex; width: 100%; min-height: 42px; align-items: center; gap: 12px; margin: 2px 0; border: 1px solid transparent; border-radius: 12px; color: rgb(255 255 255 / 0.7); text-align: left; font-size: 13px; transition: background 160ms ease, color 160ms ease, border-color 160ms ease, transform 160ms ease; }
+.guru-nav-item:hover { border-color: rgb(255 255 255 / 0.08); background: rgb(255 255 255 / 0.08); color: hsl(210 40% 98%); transform: translateX(2px); }
+.guru-nav-item-active { border-color: hsl(var(--guru-turquoise) / 0.45); background: linear-gradient(90deg, hsl(var(--guru-turquoise) / 0.28), hsl(var(--guru-sapphire) / 0.2)); color: hsl(210 40% 98%); box-shadow: inset 3px 0 0 hsl(var(--guru-yellow)); }
+
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; } }
