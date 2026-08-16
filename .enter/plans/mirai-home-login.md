@@ -1,39 +1,38 @@
-# Rencana Adaptasi Sesi AI Tutor Siswa Kelas 7
+# Rencana Adaptasi Ruang Kelas Aktif Siswa Kelas 7
 
 ## Context
-Kode `AITutorSession` yang diberikan masih menggunakan contoh bangun ruang umum seperti kubus, balok, tabung, dan bola. Dashboard siswa sudah dibatasi pada SMP kelas 7, sehingga sesi tutor harus konsisten dengan dua fokus pembelajaran: **bangun ruang segitiga** dan **jenis-jenis garis**.
+Kode `RuangKelasAktif` yang diberikan masih memakai sinopsis dan kuis tentang kubus, balok, tabung, bola, serta rumus yang tidak sesuai fokus pembelajaran saat ini. Dashboard siswa harus konsisten untuk SMP kelas 7 dengan dua kegiatan: **Bangun Ruang Segitiga** dan **Jenis-Jenis Garis**.
 
 ## Pendekatan yang direkomendasikan
-- Membuat `src/pages/siswa/AITutorSession.tsx` sebagai sesi tutor demo lokal berbasis state, mengikuti pola fase LOT, HOT, dan UP HOT dari kode pengguna.
-- Mengganti seluruh materi, opsi, petunjuk, dan feedback menjadi pertanyaan kelas 7 tentang unsur/prisma segitiga, luas/volume sederhana, serta garis sejajar, berpotongan, tegak lurus, dan transversal.
-- Mempertahankan alur interaksi: intro, pilihan ganda, petunjuk, konfirmasi, feedback benar/salah, progres fase, dan layar penyelesaian.
-- Tidak menghubungkan AI nyata/API atau backend pada tahap ini; label “AI Tutor” hanya menjadi UI tutor demo sampai konfigurasi AI tersedia.
-- Menghubungkan tombol mulai aktivitas pada `SiswaDashboard` ke sesi tutor, dengan topik dapat dipilih dari dua kartu materi.
-- Menggunakan data siswa kelas VII-A yang sudah ada dan tema semantik dashboard MIRAI.
+- Menambahkan `src/pages/siswa/RuangKelasAktif.tsx` versi kelas 7 dengan alur Presensi → Sinopsis → Kuis → Hasil.
+- Menggunakan data materi dan soal baru yang hanya membahas prisma segitiga, luas alas/volume, garis sejajar, garis berpotongan, garis tegak lurus, dan garis transversal.
+- Mempertahankan state jawaban, feedback per soal, penentuan tim Pengintai/Navigator, tampilan hasil, dan tombol mulai AI Tutor demo.
+- Menghubungkan komponen ini dari `SiswaDashboard` ketika siswa memilih materi atau masuk Ruang Kelas; sesi AI Tutor yang sudah dibuat tetap digunakan untuk pendalaman topik.
+- Tidak memakai komponen study group atau AI backend yang belum tersedia; hasil tim cukup ditampilkan sebagai state lokal yang stabil.
 
 ## File kritis
-- `src/pages/siswa/AITutorSession.tsx`: komponen sesi tutor baru.
-- `src/pages/SiswaDashboard.tsx`: state topic/session dan tombol mulai aktivitas.
-- `src/data/siswaDashboardData.ts`: sumber konteks siswa kelas 7 yang sudah tersedia.
-- `src/index.css`: hanya bila diperlukan untuk token tambahan; tidak mengubah tema utama.
+- `src/pages/siswa/RuangKelasAktif.tsx`: komponen kelas aktif baru.
+- `src/pages/SiswaDashboard.tsx`: integrasi state kelas aktif, topik, dan callback tutor.
+- `src/pages/siswa/AITutorSession.tsx`: dipanggil setelah hasil kuis sesuai topik.
+- `src/data/siswaDashboardData.ts`: sumber identitas siswa dan konteks kelas VII-A.
 
 ## Implementation checklist
-- [ ] Tambahkan tipe step tutor, fase LOT/HOT/UP HOT, dan konfigurasi fase.
-- [ ] Tambahkan bank soal LOT bangun ruang segitiga dan jenis garis.
-- [ ] Tambahkan bank soal HOT/UP HOT dengan perhitungan/prinsip yang sesuai kelas 7.
-- [ ] Tambahkan petunjuk dan feedback yang menjelaskan konsep, bukan hanya memberi jawaban.
-- [ ] Tambahkan UI progres fase, soal, opsi pilihan ganda, dan tombol konfirmasi.
-- [ ] Tambahkan layar hasil dengan jumlah jawaban benar dan fase tertinggi.
-- [ ] Hubungkan dua kartu materi pada `SiswaDashboard` ke sesi tutor dengan topik yang benar.
-- [ ] Pastikan keluar dari sesi kembali ke Ruang Kelas/beranda tanpa kehilangan aplikasi.
-- [ ] Pastikan tidak ada materi kubus, balok, tabung, bola, atau Persamaan Kuadrat tersisa dalam sesi tutor.
+- [ ] Tambahkan tipe langkah `presensi`, `sinopsis`, `quiz`, dan `hasil`.
+- [ ] Tambahkan sinopsis Bangun Ruang Segitiga dengan unsur, luas alas, luas permukaan, dan volume prisma segitiga.
+- [ ] Tambahkan sinopsis Jenis-Jenis Garis dengan sejajar, berpotongan, tegak lurus, dan transversal.
+- [ ] Tambahkan soal kuis kelas 7 dengan jawaban benar yang sesuai topik terpilih.
+- [ ] Tambahkan feedback jawaban, progres kuis, dan penentuan tim berdasarkan skor.
+- [ ] Tambahkan layar hasil dengan tombol Mulai AI Tutor dan Kembali ke Ruang Kelas.
+- [ ] Hubungkan kartu materi siswa ke topik kelas aktif yang tepat.
+- [ ] Pastikan tidak ada kubus, balok, tabung, bola, atau materi kelas non-7 dalam komponen baru.
 
 ## Verification checklist
-- [ ] Verifikasi sesi Bangun Ruang Segitiga menampilkan soal unsur prisma, luas permukaan, dan volume.
-- [ ] Verifikasi sesi Jenis-Jenis Garis menampilkan soal garis sejajar, berpotongan, tegak lurus, dan transversal.
-- [ ] Verifikasi intro, pilihan jawaban, petunjuk, feedback benar/salah, lanjut, dan selesai berjalan.
-- [ ] Verifikasi jawaban kosong tidak dapat dikonfirmasi.
-- [ ] Verifikasi hasil menghitung jawaban benar sesuai pilihan pengguna.
-- [ ] Verifikasi navigasi keluar mengembalikan siswa ke Ruang Kelas.
-- [ ] Verifikasi layout tutor tetap terbaca pada mobile dan desktop.
+- [ ] Verifikasi presensi menampilkan Matematika kelas VII-A dan nama siswa demo.
+- [ ] Verifikasi sinopsis topik segitiga tidak menampilkan materi bangun ruang sisi lengkung.
+- [ ] Verifikasi sinopsis garis mencakup empat jenis garis yang ditetapkan.
+- [ ] Verifikasi kuis menerima pilihan, menampilkan jawaban benar/salah, lalu lanjut ke soal berikutnya.
+- [ ] Verifikasi skor akhir dan tim Pengintai/Navigator dihitung dari jawaban aktual.
+- [ ] Verifikasi tombol Mulai AI Tutor membuka sesi tutor untuk topik yang sama.
+- [ ] Verifikasi tombol keluar mengembalikan siswa ke Beranda/Ruang Kelas tanpa crash.
+- [ ] Verifikasi layout responsive pada mobile dan desktop.
 - [ ] Jalankan lint dan build melalui workflow framework setelah implementasi.
