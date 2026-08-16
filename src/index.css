@@ -122,5 +122,39 @@
 .mirai-ring-two { right: 5rem; bottom: 5rem; width: 11rem; height: 11rem; }
 .mirai-dot { position: absolute; width: 0.45rem; height: 0.45rem; border-radius: 999px; background: #6366f1; }
 .mirai-title { font-size: clamp(3.25rem, 5vw, 4.5rem); font-weight: 900; letter-spacing: -0.06em; line-height: 1; color: #6d4ee8; text-shadow: 0 5px 20px rgb(109 78 232 / 0.15); }
+
+:root {
+  --guru-sapphire: 201 74% 38%;
+  --guru-sapphire-deep: 195 72% 18%;
+  --guru-sapphire-soft: 188 60% 93%;
+  --guru-turquoise: 174 68% 38%;
+  --guru-turquoise-soft: 171 62% 90%;
+  --guru-yellow: 43 91% 55%;
+  --guru-yellow-soft: 45 100% 91%;
+  --guru-brown: 27 48% 31%;
+}
+
+.admin-sidebar {
+  background: hsl(var(--guru-sapphire-deep));
+  color: hsl(210 40% 98%);
+}
+
+.admin-sidebar nav button {
+  color: hsl(210 40% 98% / 0.82);
+}
+
+.admin-sidebar nav button:hover,
+.admin-sidebar nav button[aria-current="page"] {
+  color: hsl(210 40% 98%);
+}
+
+.admin-hero {
+  background: linear-gradient(135deg, hsl(var(--guru-sapphire)), hsl(var(--guru-turquoise)));
+}
+
+.glass {
+  background: hsl(var(--card) / 0.88);
+  backdrop-filter: blur(12px);
+}
 @media (max-width: 1023px) { .mirai-page { overflow-y: auto; } .mirai-ring-two { right: 1.5rem; bottom: 2rem; } }
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; } }
