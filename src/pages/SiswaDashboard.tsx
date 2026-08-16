@@ -1,29 +1,24 @@
 import { useState } from "react";
-import { BookOpen, Calendar, CheckCircle2, Flame, Home, LogOut, Menu, PlayCircle, Star, Target, User, X, Zap } from "lucide-react";
+import { BookOpen, Calendar, CheckCircle2, ClipboardList, Flame, Grid2X2, LogOut, Menu, Star, Target, TrendingUp, User, UsersRound, X, Zap } from "lucide-react";
 import { assignments, groups, lessons, siswaProfile } from "@/data/siswaDashboardData";
 import AITutorSession from "./siswa/AITutorSession";
 import RuangKelasAktif from "./siswa/RuangKelasAktif";
 
 const menuItems = [
-  { label: "Beranda", Icon: Home },
-  { label: "Jadwal Pelajaran", Icon: Calendar },
-  { label: "Ruang Kelas", Icon: PlayCircle },
+  { label: "Jadwal Pelajaran", Icon: Calendar, expandable: true },
+  { label: "Ruang Kelas", Icon: Grid2X2 },
   { label: "Jendela Ilmu", Icon: BookOpen },
-  { label: "Meja Kerja", Icon: CheckCircle2 },
-  { label: "Papan Nama", Icon: User },
+  { label: "Ruang Kolaborasi", Icon: UsersRound },
+  { label: "Jejak Progres", Icon: TrendingUp },
 ];
 
 function Navigation({ active, open, onClose, onSelect }: { active: string; open: boolean; onClose: () => void; onSelect: (label: string) => void }) {
+  const [scheduleOpen, setScheduleOpen] = useState(true);
   return (
     <aside className={`fixed inset-y-0 left-0 z-50 flex w-72 flex-col border-r border-border bg-card shadow-xl transition-transform lg:static lg:translate-x-0 lg:shadow-none ${open ? "translate-x-0" : "-translate-x-full"}`}>
-      <div className="flex items-center gap-3 border-b border-border p-6">
-        <div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[hsl(var(--guru-turquoise))] text-lg font-black text-primary-foreground">M</div>
-        <div><h1 className="text-2xl font-black">MIRAI</h1><p className="text-[10px] font-bold uppercase tracking-widest text-[hsl(var(--guru-turquoise))]">Portal Siswa</p></div>
-        <button type="button" onClick={onClose} className="ml-auto lg:hidden" aria-label="Tutup menu"><X size={18} /></button>
-      </div>
-      <div className="m-3 rounded-2xl border border-border bg-muted/50 p-4"><div className="flex items-center gap-3"><div className="flex h-11 w-11 items-center justify-center rounded-xl bg-[hsl(var(--guru-yellow))] font-bold text-[hsl(var(--guru-brown))]">AR</div><div><p className="text-sm font-bold">{siswaProfile.name}</p><p className="text-xs text-muted-foreground">{siswaProfile.className} · {siswaProfile.nisn}</p></div></div><p className="mt-3 flex items-center gap-1.5 text-xs font-semibold text-[hsl(var(--guru-brown))]"><Flame size={13} /> {siswaProfile.streak} hari streak</p></div>
-      <nav className="flex-1 space-y-1 px-3 py-2">{menuItems.map(({ label, Icon }) => <button type="button" key={label} onClick={() => { onSelect(label); onClose(); }} className={`flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-medium ${active === label ? "bg-[hsl(var(--guru-turquoise))] text-primary-foreground" : "text-foreground hover:bg-muted"}`}><Icon size={17} /><span className="flex-1 text-left">{label}</span>{label === "Meja Kerja" && <span className="rounded-full bg-destructive px-2 py-0.5 text-xs text-destructive-foreground">{assignments.filter((item) => !item.done).length}</span>}</button>)}</nav>
-      <button type="button" onClick={() => window.location.assign("/")} className="m-3 flex items-center gap-3 rounded-xl px-4 py-3 text-sm text-destructive hover:bg-destructive/10"><LogOut size={17} /> Keluar</button>
+      <div className="flex items-center justify-between border-b border-border px-6 py-6"><div className="flex items-center gap-3"><div className="flex h-10 w-10 items-center justify-center rounded-2xl bg-[hsl(var(--guru-turquoise))] text-lg font-black text-primary-foreground">M</div><div><h1 className="text-2xl font-black">MIRAI</h1><p className="text-[10px] font-bold uppercase tracking-widest text-[hsl(var(--guru-turquoise))]">Portal Siswa</p></div></div><button type="button" onClick={onClose} className="rounded-lg p-2 text-muted-foreground lg:hidden" aria-label="Tutup menu"><X size={18} /></button></div>
+      <nav className="flex-1 overflow-y-auto px-3 py-5"><p className="mb-3 px-3 text-[10px] font-bold uppercase tracking-[0.22em] text-muted-foreground">Navigasi</p><div className="space-y-1">{menuItems.map(({ label, Icon, expandable }) => <div key={label}><button type="button" onClick={() => { if (expandable) setScheduleOpen((value) => !value); else { onSelect(label); onClose(); } }} className={`flex w-full items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium transition ${expandable && scheduleOpen ? "bg-[hsl(var(--guru-turquoise))] text-primary-foreground shadow-sm" : "text-foreground hover:bg-muted"}`}><Icon size={17} /><span className="flex-1 text-left">{label}</span>{expandable && <span className={`text-xs transition-transform ${scheduleOpen ? "rotate-180" : ""}`}>⌄</span>}</button>{expandable && scheduleOpen && <div className="space-y-1 pb-2 pt-1"><button type="button" onClick={() => { onSelect("Jadwal Semester"); onClose(); }} className={`ml-0 flex w-full items-center gap-3 rounded-xl px-9 py-2.5 text-sm ${active === "Jadwal Semester" ? "bg-[hsl(var(--guru-turquoise))] font-semibold text-primary-foreground" : "bg-[hsl(var(--guru-turquoise))] text-primary-foreground"}`}><Calendar size={15} /> Jadwal Semester</button><button type="button" onClick={() => { onSelect("Jadwal MID / Final"); onClose(); }} className="flex w-full items-center gap-3 rounded-xl px-9 py-2.5 text-sm text-foreground hover:bg-muted"><ClipboardList size={15} /> Jadwal MID / Final</button></div>}</div>)}</div><div className="my-5 border-t border-border" /><button type="button" onClick={() => { onSelect("Papan Nama"); onClose(); }} className={`flex w-full items-center gap-3 rounded-xl px-3 py-3 text-sm font-medium ${active === "Papan Nama" ? "bg-[hsl(var(--guru-turquoise))] text-primary-foreground" : "text-foreground hover:bg-muted"}`}><User size={17} /> Profil</button></nav>
+      <button type="button" onClick={() => window.location.assign("/")} className="m-3 flex items-center gap-3 rounded-xl border border-border bg-muted/40 px-4 py-3 text-sm text-muted-foreground transition hover:bg-muted hover:text-foreground"><LogOut size={17} /> Keluar</button>
     </aside>
   );
 }
