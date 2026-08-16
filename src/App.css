@@ -1,42 +1,45 @@
 #root {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+  min-height: 100vh;
 }
 
-.logo {
-  height: 6em;
-  padding: 1.5em;
-  will-change: filter;
-  transition: filter 300ms;
-}
-.logo:hover {
-  filter: drop-shadow(0 0 2em #646cffaa);
-}
-.logo.react:hover {
-  filter: drop-shadow(0 0 2em #61dafbaa);
+.mirai-page {
+  isolation: isolate;
+  background: linear-gradient(135deg, #c7d2fe 0%, #ddd6fe 22%, #f5d0fe 46%, #fde68a 72%, #a7f3d0 100%);
 }
 
-@keyframes logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.mirai-background,
+.mirai-grid {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  a:nth-of-type(2) .logo {
-    animation: logo-spin infinite 20s linear;
-  }
+.mirai-background {
+  overflow: hidden;
+  background: rgb(255 255 255 / 0.26);
 }
 
-.card {
-  padding: 2em;
+.mirai-grid {
+  opacity: 0.1;
+  background-image: linear-gradient(rgb(99 102 241 / 0.3) 1px, transparent 1px), linear-gradient(90deg, rgb(99 102 241 / 0.3) 1px, transparent 1px);
+  background-size: 60px 60px;
 }
 
-.read-the-docs {
-  color: #888;
+.mirai-orb { position: absolute; border-radius: 999px; filter: blur(72px); opacity: 0.3; }
+.mirai-orb-one { top: -12rem; left: -10rem; width: 34rem; height: 34rem; background: #818cf8; }
+.mirai-orb-two { top: 4rem; right: -8rem; width: 28rem; height: 28rem; background: #e879f9; }
+.mirai-orb-three { bottom: -12rem; left: 28%; width: 34rem; height: 28rem; background: #86efac; }
+.mirai-ring { position: absolute; border: 1px solid rgb(255 255 255 / 0.35); border-radius: 999px; }
+.mirai-ring-one { top: 5rem; left: 4rem; width: 8rem; height: 8rem; }
+.mirai-ring-two { right: 5rem; bottom: 5rem; width: 11rem; height: 11rem; }
+.mirai-dot { position: absolute; width: 0.45rem; height: 0.45rem; border-radius: 999px; background: #6366f1; }
+.mirai-title { font-size: clamp(3.25rem, 5vw, 4.5rem); font-weight: 900; letter-spacing: -0.06em; line-height: 1; color: #6d4ee8; text-shadow: 0 5px 20px rgb(109 78 232 / 0.15); }
+
+@media (max-width: 1023px) {
+  .mirai-page { overflow-y: auto; }
+  .mirai-ring-two { right: 1.5rem; bottom: 2rem; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { scroll-behavior: auto !important; animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
 }

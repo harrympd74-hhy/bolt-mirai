@@ -23,16 +23,16 @@ Pengguna ingin mengganti halaman awal template menjadi home/login MIRAI berdasar
 - `package.json`: tidak menambah dependency karena `framer-motion` dan `lucide-react` sudah tersedia.
 
 ## Implementation checklist
-- [ ] Ganti template `Index` menjadi halaman home/login MIRAI dengan pembagian layout kiri/kanan.
-- [ ] Tambahkan latar gradient mesh, grid lembut, lingkaran dekoratif, dan titik animasi sesuai referensi.
-- [ ] Tambahkan logo, judul MIRAI, tagline, dan blok empat anggota tim riset menggunakan aset yang diberikan.
-- [ ] Tambahkan empat kartu peran dengan konfigurasi judul, deskripsi, warna aksen, gambar, dan role key.
-- [ ] Tambahkan modal login peran dengan kredensial demo lokal yang dipertahankan dari kode acuan.
-- [ ] Tambahkan toggle password, remember-me, loading, error login, penutupan modal, dan navigasi demo yang sudah ada tanpa membuat dashboard baru.
-- [ ] Tambahkan atau sesuaikan modal admin minimal jika tombol admin dipertahankan; jangan menambahkan rute admin.
-- [ ] Hilangkan batasan CSS template yang menyebabkan `#root` tidak memenuhi viewport.
-- [ ] Pastikan interaksi kartu peran, modal, dan tombol admin dapat digunakan dengan keyboard.
-- [ ] Pastikan layout desktop, tablet, dan mobile tidak mengalami overflow horizontal.
+- [x] Ganti template `Index` menjadi halaman home/login MIRAI dengan pembagian layout kiri/kanan.
+- [x] Tambahkan latar gradient mesh, grid lembut, lingkaran dekoratif, dan titik animasi sesuai referensi.
+- [x] Tambahkan logo, judul MIRAI, tagline, dan blok empat anggota tim riset menggunakan aset yang diberikan.
+- [x] Tambahkan empat kartu peran dengan konfigurasi judul, deskripsi, warna aksen, gambar, dan role key.
+- [x] Tambahkan modal login peran dengan kredensial demo lokal yang dipertahankan dari kode acuan.
+- [x] Tambahkan toggle password, loading, error login, penutupan modal, dan navigasi demo yang sudah ada tanpa membuat dashboard baru.
+- [x] Tambahkan modal admin minimal; jangan menambahkan rute admin.
+- [x] Hilangkan batasan CSS template yang menyebabkan `#root` tidak memenuhi viewport.
+- [x] Pastikan interaksi kartu peran, modal, dan tombol admin dapat digunakan dengan keyboard.
+- [x] Pastikan layout desktop, tablet, dan mobile tidak mengalami overflow horizontal.
 
 ## Verification checklist
 - [ ] Verifikasi state awal `/` menampilkan seluruh branding, tim riset, empat peran, latar, dan tombol admin.
