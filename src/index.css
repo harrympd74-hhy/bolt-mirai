@@ -124,6 +124,12 @@
 .mirai-title { font-size: clamp(3.25rem, 5vw, 4.5rem); font-weight: 900; letter-spacing: -0.06em; line-height: 1; color: #6d4ee8; text-shadow: 0 5px 20px rgb(109 78 232 / 0.15); }
 
 :root {
+  --mirai-background: 188 60% 96%;
+  --mirai-sidebar: 195 72% 18%;
+  --mirai-accent: 174 68% 38%;
+  --mirai-cosmic: 201 74% 38%;
+  --mirai-mist: 188 24% 88%;
+  --mirai-success: 174 68% 38%;
   --guru-sapphire: 201 74% 38%;
   --guru-sapphire-deep: 195 72% 18%;
   --guru-sapphire-soft: 188 60% 93%;
