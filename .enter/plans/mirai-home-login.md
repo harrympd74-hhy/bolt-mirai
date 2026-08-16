@@ -1,40 +1,45 @@
-# Rencana Redesign Beranda Dashboard Guru Kelas 7
+# Rencana Implementasi Dashboard Siswa SMP Kelas 7
 
 ## Context
-Beranda guru saat ini masih berupa hero sederhana, shortcut, dan daftar jadwal. Pengguna ingin tampilan awal dinaikkan kualitasnya agar mendekati referensi dashboard modern: top utility/search area, banner sambutan, kartu metrik, panel jadwal, progres pembelajaran, kalender, pengumuman, daftar kelas, dan akses cepat. Semua data tetap demo lokal dan dibatasi pada SMP kelas 7.
+Pengguna memberikan rancangan dashboard siswa MIRAI, tetapi data contoh masih menggunakan Kelas 8C, Persamaan Kuadrat, dan materi kelas lain. Scope telah dikoreksi menjadi SMP kelas 7 dengan fokus kegiatan Matematika: **bangun ruang segitiga** dan **jenis-jenis garis**. Proyek saat ini belum memiliki halaman/komponen dashboard siswa yang dirujuk, sehingga implementasi akan dibuat terintegrasi sebagai route baru tanpa mengubah dashboard admin maupun guru.
 
 ## Pendekatan yang direkomendasikan
-- Fokus perubahan pada `src/pages/guru/Beranda.tsx` dan style global yang diperlukan; sidebar, profil, dan route lain tetap dipertahankan.
-- Mengubah beranda menjadi dashboard grid responsif dengan hirarki visual seperti referensi, menggunakan kartu semantic `bg-card`, border, shadow, dan token tema MIRAI.
-- Menambahkan header konteks guru di area konten: pencarian siswa/materi, notifikasi sederhana, dan profil ringkas dari `defaultProfileData`, tanpa membuat backend pencarian.
-- Menambahkan banner sambutan bergradasi tosca–sapphire dengan copy khusus Guru Demo dan konteks kelas 7 SMP, tanpa aset ilustrasi eksternal baru.
-- Menambahkan empat metrik demo yang relevan untuk kelas 7: jumlah siswa, kelas diampu, tugas aktif, dan rata-rata nilai.
-- Menambahkan panel jadwal hari ini yang hanya berisi VII-A, VII-B, VII-C; panel progres pembelajaran; kalender bulan berjalan; pengumuman; serta kartu kelas VII-A/VII-B/VII-C.
-- Menambahkan akses cepat yang tetap memanggil `onNavigate`, sehingga interaksi menuju placeholder yang sudah tersedia tetap berfungsi.
-- Menjaga mobile layout satu kolom, tablet dua kolom, dan desktop grid asimetris; menghindari overflow horizontal.
+- Menambahkan route `/siswa` yang merender dashboard siswa mandiri dengan state frontend lokal.
+- Mengadaptasi struktur visual kode yang diberikan: sidebar portal siswa, kartu profil, navigasi aktif, statistik belajar, jadwal, tugas, ruang kelas, dan placeholder menu.
+- Mengganti seluruh identitas menjadi siswa SMP kelas 7; menghindari Kelas 8/9, persamaan kuadrat, serta materi non-kelas-7.
+- Menggunakan aktivitas utama Matematika kelas 7: pengenalan bangun ruang berbasis segitiga, luas/volume/prisma segitiga, serta jenis garis (sejajar, berpotongan, tegak lurus, dan transversal).
+- Membuat interaksi lokal untuk navigasi sidebar, submenu jadwal, membuka ruang kelas aktif, memilih tim belajar, dan membuka sesi tutor sebagai panel/halaman internal sederhana; tidak mengaktifkan AI backend atau API karena konfigurasi AI masih tahap pembangunan.
+- Menggunakan token tema MIRAI yang tersedia dan komponen lucide/framer-motion yang sudah terpasang; tidak menambah dependency.
+- Menambahkan responsive mobile layout agar sidebar berubah menjadi drawer dan konten tetap terbaca.
 
-## File kritis
-- `src/pages/guru/Beranda.tsx`: struktur dashboard baru dan data demo kelas 7.
-- `src/data/guruData.ts`: sumber nama guru, mata pelajaran, kelas ampuh, dan identitas profil.
-- `src/index.css`: token tema yang sudah tersedia; hanya ditambah utilitas bila benar-benar diperlukan.
+## File kritis yang akan dibuat/dimodifikasi
+- `src/pages/SiswaDashboard.tsx`: shell dashboard, state navigasi, sidebar, dashboard beranda, ruang kelas, dan placeholder.
+- `src/data/siswaDashboardData.ts`: data demo siswa kelas 7, jadwal, tugas, materi, statistik, dan kelompok belajar.
+- `src/router.tsx`: route `/siswa` sebelum catch-all.
+- `src/index.css`: token siswa tambahan bila diperlukan untuk warna aksen/orange/amber/emerald dan grid dekoratif.
+- Komponen kecil di `src/components/siswa/` bila pemisahan diperlukan untuk menjaga dashboard tidak monolitik.
 
 ## Implementation checklist
-- [ ] Tambahkan utility header beranda dengan search field demo, label guru, dan indikator notifikasi.
-- [ ] Ubah hero menjadi banner sambutan dengan konteks Guru Demo, Matematika, dan SMP kelas 7.
-- [ ] Tambahkan empat kartu statistik demo untuk siswa, kelas, tugas, dan nilai.
-- [ ] Tambahkan panel jadwal hari ini untuk VII-A/VII-B/VII-C dengan status selesai/aktif/akan datang.
-- [ ] Tambahkan panel progres pembelajaran berbasis mata pelajaran dan kelas 7.
-- [ ] Tambahkan kalender ringkas serta panel pengumuman sekolah.
-- [ ] Tambahkan daftar kartu kelas VII-A, VII-B, VII-C dengan jumlah siswa dan progres.
-- [ ] Tambahkan area akses cepat yang terhubung ke callback `onNavigate`.
-- [ ] Terapkan grid responsif dan state hover/focus yang konsisten dengan tema MIRAI.
-- [ ] Pastikan tidak ada data kelas VIII atau IX pada beranda baru.
+- [ ] Tambahkan data demo siswa kelas VII-A dan konteks SMP kelas 7.
+- [ ] Tambahkan jadwal hanya untuk pembelajaran Matematika kelas 7 dan aktivitas terkait bangun ruang segitiga/jenis garis.
+- [ ] Tambahkan tugas aktif hanya untuk topik bangun ruang segitiga dan jenis-jenis garis.
+- [ ] Tambahkan sidebar siswa dengan Beranda, Jadwal Pelajaran, Ruang Kelas, Jendela Ilmu, Meja Kerja, dan Papan Nama.
+- [ ] Tambahkan statistik streak, daya juang, total poin, dan progres pembelajaran.
+- [ ] Tambahkan kartu pelajaran yang sedang berlangsung dengan aksi masuk kelas.
+- [ ] Tambahkan panel Jadwal Hari Ini dan Meja Kerja.
+- [ ] Tambahkan akses cepat ke ruang kelas, materi, nilai, dan profil.
+- [ ] Tambahkan halaman internal Ruang Kelas dengan materi/aktivitas dua topik fokus.
+- [ ] Tambahkan halaman placeholder untuk menu siswa lain tanpa menampilkan konten kelas non-7.
+- [ ] Tambahkan route `/siswa` dan pastikan route `/`, `/admin`, dan `/guru` tetap tidak berubah.
+- [ ] Terapkan animasi masuk ringan, active state, dan responsive drawer tanpa overflow horizontal.
 
 ## Verification checklist
-- [ ] Verifikasi `/guru` menampilkan banner, statistik, jadwal, progres, kalender, pengumuman, kelas, dan akses cepat.
-- [ ] Verifikasi seluruh label kelas hanya VII-A, VII-B, VII-C atau konteks umum Kelas 7 SMP.
-- [ ] Verifikasi tombol jadwal, kelas, bank soal, dan akses cepat memanggil navigasi yang benar.
-- [ ] Verifikasi layout desktop mengikuti komposisi dashboard referensi tanpa panel saling tumpang tindih.
-- [ ] Verifikasi tablet/mobile menjadi satu kolom atau dua kolom yang terbaca tanpa scroll horizontal.
-- [ ] Verifikasi focus-visible pada tombol dan input pencarian.
+- [ ] Verifikasi `/siswa` dapat dirender tanpa import error.
+- [ ] Verifikasi tidak ada teks Kelas 8C, Kelas 9, atau Persamaan Kuadrat pada dashboard siswa.
+- [ ] Verifikasi topik bangun ruang segitiga dan jenis-jenis garis muncul pada jadwal, tugas, materi, dan ruang kelas.
+- [ ] Verifikasi klik navigasi sidebar mengubah halaman aktif dan menu Jadwal memiliki submenu.
+- [ ] Verifikasi aksi Masuk Kelas membuka ruang kelas aktif dan tombol keluar kembali ke beranda.
+- [ ] Verifikasi kartu tugas menampilkan status selesai/belum dan jumlah tugas tertunda.
+- [ ] Verifikasi sidebar mobile/drawer serta layout mobile tidak menyebabkan overflow.
+- [ ] Verifikasi tombol keluar mengembalikan ke halaman home `/`.
 - [ ] Jalankan lint dan build proyek melalui workflow framework setelah implementasi.
