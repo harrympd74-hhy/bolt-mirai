@@ -15,7 +15,7 @@ function LineDiagram() {
   return <div className="rounded-2xl border border-[hsl(var(--guru-turquoise)/0.2)] bg-[hsl(var(--guru-turquoise-soft)/0.45)] p-4"><svg viewBox="0 0 420 190" className="h-auto w-full" role="img" aria-label="Diagram jenis-jenis garis"><line x1="35" y1="48" x2="385" y2="48" stroke="hsl(174 68% 38%)" strokeWidth="5" /><line x1="35" y1="135" x2="385" y2="135" stroke="hsl(174 68% 38%)" strokeWidth="5" /><line x1="75" y1="170" x2="335" y2="15" stroke="hsl(201 74% 38%)" strokeWidth="5" /><line x1="210" y1="35" x2="210" y2="150" stroke="hsl(43 91% 55%)" strokeWidth="4" strokeDasharray="8 6" /><text x="42" y="35" fill="hsl(27 48% 31%)" fontSize="13" fontWeight="700">Garis sejajar</text><text x="42" y="176" fill="hsl(27 48% 31%)" fontSize="13" fontWeight="700">Transversal</text><text x="218" y="100" fill="hsl(27 48% 31%)" fontSize="13" fontWeight="700">Tegak lurus</text></svg></div>;
 }
 
-export default function RuangBelajar({ onExit, group = "Penjelajah" }: { onExit: () => void; group?: "Penjelajah" | "Pengintai" }) {
+export default function RuangBelajar({ onExit, group = "Tim Pengintai" }: { onExit: () => void; group?: "Tim Pengintai" | "Tim Navigator" }) {
   const [tab, setTab] = useState<Tab>("Ringkasan");
   const [messages, setMessages] = useState<Message[]>([{ from: "tutor", text: "Hai Ahmad! Aku akan membantu kamu belajar Jenis-Jenis Garis. Mau mulai dari konsep dasar?" }, { from: "student", text: "Saya ingin memahami perbedaan garis sejajar dan tegak lurus." }, { from: "tutor", text: "Baik! Mari kita pelajari bersama melalui contoh visual dan latihan sederhana." }]);
   const [input, setInput] = useState("");

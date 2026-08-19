@@ -13,6 +13,6 @@ export const assignments = [
 ] as const;
 export const groups = [
   { name: "VII-A", students: 32, progress: 82, tone: "turquoise" },
-  { name: "Kelompok Geometri", students: 5, progress: 76, tone: "sapphire" },
-  { name: "Tim Garis", students: 4, progress: 88, tone: "yellow" },
+  { name: "Tim Pengintai", students: 5, progress: 76, tone: "sapphire" },
+  { name: "Tim Navigator", students: 4, progress: 88, tone: "yellow" },
 ] as const;
