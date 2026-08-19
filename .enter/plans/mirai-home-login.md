@@ -1,54 +1,59 @@
-# Rencana: Dashboard Tamu (Guest Dashboard) — MIRAI
+# Rencana: Revisi Sidebar Menu Dasbor Guru (Accordion + Gaya Baru)
 
 ## Context
-Pengguna ingin membangun **Dashboard Tamu** — halaman showcase publik "SMART DIGITAL LEARNING ECOSYSTEM" yang menampilkan gambaran menyeluruh ekosistem pembelajaran digital cerdas (data agregat saja, tanpa data pribadi/nilai individual). Dasbor ini dibangun **bertahap (3 tahap)**; sesuai kesepakatan, sekarang hanya **Tahap 1** yang dikerjakan lalu ditinjau pengguna.
+Pengguna ingin mengganti sidebar menu dasbor guru dengan struktur baru untuk Smart Digital Learning Ecosystem:
+- **Accordion** — submenu hanya terbuka saat menu utama diklik (Beranda tanpa submenu; 6 menu lain punya submenu; Profil Guru termasuk submenu "Keluar").
+- **Gaya**: modern, clean, **Sapphire Blue–Metallic Gold–Slate Gray–Turquoise**, card-based, dominasi **Navy Blue**.
+- Struktur menu utama sederhana (7 menu).
 
-- **Tahap 1 (sekarang)**: Kerangka halaman + Hero Section (diagram ekosistem) + kartu statistik agregat + footer.
-- **Tahap 2 (nanti)**: Learning Journey, Peran AI Tutor MIRAI, Mekanisme Productive Struggle.
-- **Tahap 3 (nanti)**: Infografis Dampak, Diagram Ekosistem Kolaborasi, Empat Pilar, Banner penutup + CTA.
+Mengganti struktur lama (`src/components/guru/navConfig.ts` dengan 30+ item flat + section) yang dipakai oleh `Sidebar`, `MobileDrawer`, `MobileBottomNav`, `Topbar`, dan `GuruDashboard`.
 
-## Identitas & Gaya (untuk semua tahap)
-- Judul: **SMART DIGITAL LEARNING ECOSYSTEM**
-- Subjudul: *Ekosistem Pembelajaran Adaptif, Personal, Kolaboratif, dan Bermakna*
-- Slogan: *Belajar Mandiri — Berkolaborasi — Merefleksi — Bertumbuh*
-- Gaya: modern, clean, futuristik, card-based, rounded corners, soft shadow, infografis interaktif. Desktop-first (16:9) namun responsif.
-- Warna: **Navy Blue** (dominasi), Putih, Biru Muda, Hijau (growth), Oranye (productive struggle), Ungu (AI).
+## Struktur menu baru
+| id | label | submenu (id — label) |
+|---|---|---|
+| beranda | Beranda | — |
+| kelas | Kelas Saya | daftar-kelas — Daftar Kelas; buat-kelas — Buat Kelas Baru; jadwal-kelas — Jadwal Kelas; arsip-kelas — Arsip Kelas |
+| siswa | Siswa | semua-siswa — Semua Siswa; progress-capaian — Progress & Capaian; kelompok-belajar — Kelompok Belajar; productive-struggle — Productive Struggle; tutor-sebaya — Tutor Sebaya |
+| pembelajaran | Pembelajaran | rencana-pembelajaran — Rencana Pembelajaran; asesmen — Asesmen (Awal & Akhir); materi-konten — Materi & Konten; ai-tutor — AI Tutor MIRAI; refleksi-siswa — Refleksi Siswa; aktivitas-kolaboratif — Aktivitas Kolaboratif |
+| laporan | Laporan | laporan-kelas — Laporan Kelas; learning-analytics — Learning Analytics; dampak-pembelajaran — Dampak Pembelajaran; partisipasi-kehadiran — Partisipasi & Kehadiran; ekspor-data — Ekspor Data |
+| pengaturan | Pengaturan | preferensi-tampilan — Preferensi Tampilan; notifikasi — Notifikasi; integrasi-lms — Integrasi LMS; privasi-data — Privasi & Data |
+| profil-guru | Profil Guru | edit-profil — Edit Profil; keamanan-akun — Keamanan Akun; bantuan-panduan — Bantuan & Panduan; keluar — Keluar |
 
 ## Pendekatan
-1. **Font** di `index.html`: tampilkan font Google "Bricolage Grotesque" (display) + "Plus Jakarta Sans" (body) — karakter premium edtech, hindari font generik.
-2. **Token warna tamu** di `src/index.css`: `--tamu-navy`, `--tamu-navy-deep`, `--tamu-sky`, `--tamu-sky-soft`, `--tamu-green`, `--tamu-orange`, `--tamu-purple` + kelas utilitas `.tamu-hero-bg` (gradient navy mesh) dan efek glow.
-3. **Route** `/tamu` di `src/router.tsx` → `GuestDashboard`.
-4. **Login** `src/pages/Index.tsx`: peran "Tamu" (key `tamu`) → `navigate("/tamu")` (bukan alert).
-5. **Halaman showcase** satu file utama + komponen seksi:
-   - `src/pages/GuestDashboard.tsx` — shell halaman: sticky header (logo + judul + slogan + CTA kembali ke beranda), konten seksi, footer.
-   - `src/pages/tamu/Hero.tsx` — hero: judul, subjudul, slogan, dan **diagram ekosistem** (Siswa di pusat; dikelilingi Guru, AI Tutor MIRAI, Tutor Sebaya, Orang Tua, Data, Teknologi) dibuat dengan CSS/SVG (node orbit + garis koneksi).
-   - `src/pages/tamu/Stats.tsx` — kartu statistik agregat (demo): Total Siswa 487, Kelas Aktif 18, Aktivitas/minggu 4.250, Interaksi AI 12.800, Partisipasi Orang Tua 68%, Penyelesaian Tugas 87%.
-   - Penanda kecil di bawah seksi (mis. "Tahap 2 & 3 menyusul") agar halaman terasa utuh meski belum lengkap.
-6. Semua data hanya agregat/demo; tidak ada data pribadi.
+1. **`navConfig.ts`**: ganti tipe `NavItem` menjadi `{id,label,icon,children?}` (tanpa `section`); ekspor `navItems`, `breadcrumbMap` (parent + child), dan `mobileBottomItems` (beranda, kelas, siswa, pembelajaran, laporan).
+2. **`Sidebar.tsx`**: render accordion — state `openMenus` lokal; klik menu ber-submenu toggles; klik submenu → `onNavigate(child.id)`; parent aktif jika dirinya atau child-nya aktif; mode collapsed: klik parent → expand sidebar + buka accordion; tooltip tetap.
+3. **`MobileDrawer.tsx`**: accordion serupa (submenu di-indent), klik submenu → `onNavigate`.
+4. **`GuruDashboard.tsx`**: `navigate(id)` — jika id menu utama (punya children) → arahkan ke child pertama; jika `id==="keluar"` → `window.location.assign("/")`; konten: `beranda` → Beranda, `edit-profil` → ProfilGuru, lainnya → PlaceholderPage (dengan ikon parent/child yang benar); judul breadcrumb di-resolve dari `breadcrumbMap`.
+5. **`Topbar.tsx`**: tombol profil → `onNavigate("edit-profil")` (label breadcrumb otomatis benar karena `breadcrumbMap` berisi child).
+6. **`Beranda.tsx`**: remap `onNavigate`: `jadwal-mengajar`→`jadwal-kelas`, `detail-kelas`→`daftar-kelas`, quickActions `tugas`→`rencana-pembelajaran`, `presensi`→`partisipasi-kehadiran`, `modul-ajar`→`rencana-pembelajaran`, `sumber-materi`→`materi-konten`.
+7. **`index.css`**: perbarui `.guru-sidebar` ke gradient **Navy** (bukan teal); gaya aktif **Metallic Gold + Slate Gray** (`.guru-nav-item-active` dengan inset gold + latar slate, `.guru-nav-child-active` berwarna gold); tambah token `--guru-gold: 45 80% 55%` dan `--guru-slate: 215 20% 42%`.
 
-## File yang diubah/dibuat
-- **Edit** `index.html` — tambah Google Fonts (Bricolage Grotesque, Plus Jakarta Sans).
-- **Edit** `src/index.css` — token `--tamu-*` + kelas gradient/glow + font display utility.
-- **Edit** `src/router.tsx` — route `/tamu`.
-- **Edit** `src/pages/Index.tsx` — login `tamu` → `navigate("/tamu")`.
-- **Buat** `src/pages/GuestDashboard.tsx` — shell showcase (header + footer).
-- **Buat** `src/pages/tamu/Hero.tsx` — hero + diagram ekosistem.
-- **Buat** `src/pages/tamu/Stats.tsx` — kartu statistik agregat.
+## File yang diubah
+- `src/components/guru/navConfig.ts` (tulis ulang struktur)
+- `src/components/guru/Sidebar.tsx` (accordion)
+- `src/components/guru/MobileDrawer.tsx` (accordion)
+- `src/components/guru/MobileBottomNav.tsx` (pakai item baru — tidak berubah kode, hanya data)
+- `src/pages/GuruDashboard.tsx` (navigate + content switch + resolve title)
+- `src/components/guru/Topbar.tsx` (profil → edit-profil)
+- `src/pages/guru/Beranda.tsx` (remap id navigasi)
+- `src/index.css` (gaya sidebar navy + gold/slate)
 
 ## Implementation checklist
-- [ ] `index.html`: tambah `preconnect` + link Google Fonts (Bricolage Grotesque 500–800, Plus Jakarta Sans 400–700).
-- [ ] `src/index.css`: tambah token `--tamu-*` (navy/navy-deep/sky/sky-soft/green/orange/purple), `.font-display`, `.tamu-hero-bg` (gradient navy mesh + glow), utilitas card glow.
-- [ ] `src/router.tsx`: import + route `{path:"/tamu"}` → `<GuestDashboard />`.
-- [ ] `src/pages/Index.tsx`: `LoginModal.submit` — `role.key === "tamu"` → `navigate("/tamu")`.
-- [ ] `src/pages/tamu/Stats.tsx`: 6 kartu statistik agregat (ikon lucide + nilai + label, warna aksen hijau/oranye/ungu/biru).
-- [ ] `src/pages/tamu/Hero.tsx`: judul, subjudul, slogan, dan diagram ekosistem (pusat Siswa + 6 node pendukung, garis koneksi SVG, animasi ring/float ringan).
-- [ ] `src/pages/GuestDashboard.tsx`: sticky header (logo MIRAI + identitas + tombol "Beranda"), urutan seksi Hero → Stats, footer sederhana, penanda "Tahap 2 & 3 menyusul".
-- [ ] Semua ikon dari lucide-react (tanpa emoji).
+- [ ] `navConfig.ts`: tipe `NavItem` baru dengan `children?`, 7 menu + submenu sesuai tabel, `breadcrumbMap` mencakup child, `mobileBottomItems` baru.
+- [ ] `index.css`: `.guru-sidebar` gradient navy; `.guru-nav-item-active` (inset metallic gold + latar slate) dan `.guru-nav-child-active` (teks gold); token `--guru-gold`, `--guru-slate`.
+- [ ] `Sidebar.tsx`: accordion (`openMenus`), chevron kanan/bawah, klik parent toggles, klik child `onNavigate(child)`, highlight parent aktif bila ada child aktif, mode collapsed tetap aman (klik parent → expand + buka).
+- [ ] `MobileDrawer.tsx`: accordion dengan submenu indent, klik child `onNavigate(child)`.
+- [ ] `GuruDashboard.tsx`: `navigate` menangani parent→child pertama, `keluar`→logout, konten `beranda`→Beranda, `edit-profil`→ProfilGuru, lainnya→PlaceholderPage, judul dari `breadcrumbMap`.
+- [ ] `Topbar.tsx`: tombol profil → `onNavigate("edit-profil")`.
+- [ ] `Beranda.tsx`: semua `onNavigate` lama di-remap ke id baru.
+- [ ] Tidak ada id menu lama yang tersisa di referensi navigasi (grep `jadwal-mengajar|detail-kelas|beban-kerja|kelas-aktif|pilih-mode|bank-soal|jurnal-harian` → 0 selain navConfig lama yang sudah diganti).
 
 ## Verification checklist
-- [ ] Buka `http://localhost:3000/tamu` → halaman showcase tampil: header, Hero (judul "SMART DIGITAL LEARNING ECOSYSTEM" + diagram ekosistem), kartu statistik, footer.
-- [ ] Diagram ekosistem: 6 node (Guru, AI Tutor MIRAI, Tutor Sebaya, Orang Tua, Data, Teknologi) mengelilingi node pusat "Siswa" dengan garis koneksi terlihat.
-- [ ] Tidak ada data pribadi/nilai individual di halaman (hanya angka agregat).
-- [ ] Login "Tamu" di `http://localhost:3000` → mengarah ke `/tamu` (bukan alert).
-- [ ] Responsif: layout tetap rapi pada lebar desktop (1280px) dan menyusut rapi di layar lebih kecil.
+- [ ] `/guru` tampil: sidebar navy, 7 menu utama sederhana, Beranda aktif.
+- [ ] Klik "Kelas Saya" → submenu (Daftar Kelas, Buat Kelas Baru, Jadwal Kelas, Arsip Kelas) terbuka; klik lagi → tertutup. Hanya satu accordion yang terbuka sesuai klik (tidak semua terbuka bersamaan).
+- [ ] Klik submenu (mis. "Jadwal Kelas") → konten placeholder sesuai judul; parent "Kelas Saya" tetap ter-highlight.
+- [ ] Submenu "Keluar" pada Profil Guru → kembali ke halaman `/` (logout).
+- [ ] Tombol "Profil" di topbar → halaman ProfilGuru terbuka (submenu Profil Guru terbuka otomatis).
+- [ ] Beranda: akses cepat & kartu kelas mengarah ke halaman baru yang benar (placeholder).
+- [ ] Mode collapsed: klik menu ber-submenu → sidebar melebar + accordion terbuka.
 - [ ] `pnpm run build` berhasil tanpa error TypeScript/lint.
