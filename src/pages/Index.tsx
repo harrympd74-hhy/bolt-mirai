@@ -43,6 +43,7 @@ function LoginModal({ role, onClose }: { role: Role; onClose: () => void }) {
     if (role.key === "guru") navigate("/guru");
     else if (role.key === "siswa") navigate("/siswa");
     else if (role.key === "ortu") navigate("/orangtua");
+    else if (role.key === "tamu") navigate("/tamu");
     else {
       window.alert(`Selamat datang, ${role.title}!`);
       onClose();

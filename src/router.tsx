@@ -2,6 +2,7 @@ import AdminDashboard from "./pages/AdminDashboard";
 import GuruDashboard from "./pages/GuruDashboard";
 import SiswaDashboard from "./pages/SiswaDashboard";
 import OrangtuaDashboard from "./pages/OrangtuaDashboard";
+import GuestDashboard from "./pages/GuestDashboard";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 
@@ -30,6 +31,11 @@ export const routers = [
     path: "/orangtua",
     name: "orangtua",
     element: <OrangtuaDashboard />,
+  },
+  {
+    path: "/tamu",
+    name: "tamu",
+    element: <GuestDashboard />,
   },
   /* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */
   {
