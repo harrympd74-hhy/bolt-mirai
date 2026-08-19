@@ -1,13 +1,6 @@
-import { Bell, BookOpen, CalendarDays, ChevronRight, ClipboardList, MessageSquareText, Sparkles, Star, TrendingUp, Users, Zap } from "lucide-react";
+import { Bell, CalendarDays, ChevronRight, ClipboardList, MessageSquareText, Sparkles, TrendingUp, Users } from "lucide-react";
 
 interface BerandaProps { onNavigate: (id: string) => void; }
-
-const stats = [
-  { label: "Streak Belajar", value: "12 hari", change: "Konsisten minggu ini", icon: Zap },
-  { label: "Daya Juang", value: "82%", change: "+5% dari bulan lalu", icon: TrendingUp },
-  { label: "Total Poin", value: "3.280", change: "Naik 210 poin", icon: Star },
-  { label: "Rata-rata Nilai", value: "78,4", change: "Matematika · Kelas 7", icon: BookOpen },
-] as const;
 
 const schedule = [
   { day: "Senin", subject: "Sudut", time: "07.30 – 09.00", teacher: "Guru Matematika" },
@@ -57,19 +50,6 @@ export default function Beranda({ onNavigate }: BerandaProps) {
         </div>
         <div className="absolute -right-8 -top-16 h-52 w-52 rounded-full border-[28px] border-primary-foreground/10" />
         <div className="absolute -bottom-24 right-28 h-48 w-48 rounded-full border-[22px] border-[hsl(var(--ortu-gold)/0.4)]" />
-      </section>
-
-      <section className="grid grid-cols-2 gap-3 lg:grid-cols-4">
-        {stats.map(({ label, value, change, icon: Icon }) => (
-          <div key={label} className="rounded-2xl border border-border bg-card p-4">
-            <div className="flex items-center justify-between">
-              <p className="text-xs font-semibold text-muted-foreground">{label}</p>
-              <span className={`rounded-lg p-2 ${iconTone}`}><Icon className="h-4 w-4" /></span>
-            </div>
-            <p className="mt-2 text-2xl font-black">{value}</p>
-            <p className="mt-1 text-[10px] font-medium text-muted-foreground">{change}</p>
-          </div>
-        ))}
       </section>
 
       <div className="grid gap-5 xl:grid-cols-[1.15fr_0.85fr]">
