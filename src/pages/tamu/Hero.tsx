@@ -2,21 +2,21 @@ import { motion } from "framer-motion";
 import { Bot, Cpu, Database, GraduationCap, HeartHandshake, LineChart, Sparkles } from "lucide-react";
 
 const orbit = [
-  { label: "Guru", icon: GraduationCap, color: "bg-[hsl(var(--tamu-green)/0.16)] text-[hsl(var(--tamu-green))] border-[hsl(var(--tamu-green)/0.3)]", x: 84.6, y: 30 },
-  { label: "AI Tutor MIRAI", icon: Bot, color: "bg-[hsl(var(--tamu-purple)/0.18)] text-[hsl(var(--tamu-purple))] border-[hsl(var(--tamu-purple)/0.35)]", x: 50, y: 10 },
-  { label: "Tutor Sebaya", icon: HeartHandshake, color: "bg-[hsl(var(--tamu-orange)/0.16)] text-[hsl(var(--tamu-orange))] border-[hsl(var(--tamu-orange)/0.32)]", x: 84.6, y: 70 },
-  { label: "Orang Tua", icon: Sparkles, color: "bg-[hsl(var(--tamu-sky)/0.16)] text-[hsl(var(--tamu-sky))] border-[hsl(var(--tamu-sky)/0.32)]", x: 50, y: 90 },
-  { label: "Data", icon: Database, color: "bg-[hsl(var(--tamu-sky)/0.16)] text-[hsl(var(--tamu-sky))] border-[hsl(var(--tamu-sky)/0.32)]", x: 15.4, y: 70 },
-  { label: "Teknologi", icon: Cpu, color: "bg-[hsl(var(--tamu-purple)/0.18)] text-[hsl(var(--tamu-purple))] border-[hsl(var(--tamu-purple)/0.35)]", x: 15.4, y: 30 },
+  { label: "Guru", icon: GraduationCap, color: "bg-[hsl(var(--tamu-green)/0.16)] text-[hsl(var(--tamu-green))] border-[hsl(var(--tamu-green)/0.3)]", x: 78, y: 30 },
+  { label: "AI Tutor MIRAI", icon: Bot, color: "bg-[hsl(var(--tamu-purple)/0.18)] text-[hsl(var(--tamu-purple))] border-[hsl(var(--tamu-purple)/0.35)]", x: 50, y: 14 },
+  { label: "Tutor Sebaya", icon: HeartHandshake, color: "bg-[hsl(var(--tamu-orange)/0.16)] text-[hsl(var(--tamu-orange))] border-[hsl(var(--tamu-orange)/0.32)]", x: 78, y: 70 },
+  { label: "Orang Tua", icon: Sparkles, color: "bg-[hsl(var(--tamu-sky)/0.16)] text-[hsl(var(--tamu-sky))] border-[hsl(var(--tamu-sky)/0.32)]", x: 50, y: 86 },
+  { label: "Data", icon: Database, color: "bg-[hsl(var(--tamu-sky)/0.16)] text-[hsl(var(--tamu-sky))] border-[hsl(var(--tamu-sky)/0.32)]", x: 22, y: 70 },
+  { label: "Teknologi", icon: Cpu, color: "bg-[hsl(var(--tamu-purple)/0.18)] text-[hsl(var(--tamu-purple))] border-[hsl(var(--tamu-purple)/0.35)]", x: 22, y: 30 },
 ];
 
 const connectorLines = [
-  { x1: 240, y1: 240, x2: 240, y2: 48 },
-  { x1: 240, y1: 240, x2: 406.4, y2: 144 },
-  { x1: 240, y1: 240, x2: 406.4, y2: 336 },
-  { x1: 240, y1: 240, x2: 240, y2: 432 },
-  { x1: 240, y1: 240, x2: 73.6, y2: 336 },
-  { x1: 240, y1: 240, x2: 73.6, y2: 144 },
+  { x1: 240, y1: 240, x2: 240, y2: 67.2 },
+  { x1: 240, y1: 240, x2: 374.4, y2: 144 },
+  { x1: 240, y1: 240, x2: 374.4, y2: 336 },
+  { x1: 240, y1: 240, x2: 240, y2: 412.8 },
+  { x1: 240, y1: 240, x2: 105.6, y2: 336 },
+  { x1: 240, y1: 240, x2: 105.6, y2: 144 },
 ];
 
 export default function Hero() {

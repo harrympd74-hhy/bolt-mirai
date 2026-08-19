@@ -6,7 +6,7 @@ const logoUrl = "https://grazia-prod.oss-ap-southeast-1.aliyuncs.com/resources/u
 
 export default function GuestDashboard() {
   return (
-    <div className="min-h-screen bg-white text-foreground">
+    <div className="min-h-screen overflow-x-hidden bg-white text-foreground">
       <header className="sticky top-0 z-40 border-b border-white/10 bg-[hsl(var(--tamu-navy)/0.92)] backdrop-blur">
         <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-3.5">
           <div className="flex items-center gap-3">

@@ -12,7 +12,7 @@ const stats = [
 
 export default function Stats() {
   return (
-    <section id="stats" className="relative bg-[hsl(var(--tamu-sky-soft)/0.5)] py-16">
+    <section id="stats" className="relative scroll-mt-16 bg-[hsl(var(--tamu-sky-soft)/0.5)] py-16">
       <div className="mx-auto max-w-7xl px-6">
         <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true, margin: "-80px" }} transition={{ duration: 0.6 }} className="mx-auto max-w-2xl text-center">
           <p className="text-xs font-bold uppercase tracking-[0.25em] text-[hsl(var(--tamu-sky))]">Ekosistem dalam Angka</p>
