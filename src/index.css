@@ -138,6 +138,8 @@
   --guru-yellow: 43 91% 55%;
   --guru-yellow-soft: 45 100% 91%;
   --guru-brown: 27 48% 31%;
+  --guru-gold: 45 80% 55%;
+  --guru-slate: 215 20% 42%;
 }
 
 .admin-sidebar {
@@ -162,13 +164,15 @@
   background: hsl(var(--card) / 0.88);
   backdrop-filter: blur(12px);
 }
-.guru-sidebar { background: linear-gradient(180deg, hsl(var(--mirai-sidebar)) 0%, hsl(195 70% 15%) 100%); color: hsl(210 40% 98%); }
+.guru-sidebar { background: linear-gradient(180deg, hsl(222 47% 14%) 0%, hsl(226 55% 9%) 100%); color: hsl(210 40% 98%); }
 .guru-sidebar-header { min-height: 78px; }
 .guru-logo-shell { width: 42px; height: 42px; padding: 4px; border: 1px solid rgb(255 255 255 / 0.28); border-radius: 12px; background: hsl(var(--card)); box-shadow: 0 8px 20px rgb(0 0 0 / 0.18); }
 .guru-sidebar-nav { scrollbar-color: rgb(255 255 255 / 0.2) transparent; }
 .guru-nav-item { display: flex; width: 100%; min-height: 42px; align-items: center; gap: 12px; margin: 2px 0; border: 1px solid transparent; border-radius: 12px; color: rgb(255 255 255 / 0.7); text-align: left; font-size: 13px; transition: background 160ms ease, color 160ms ease, border-color 160ms ease, transform 160ms ease; }
-.guru-nav-item:hover { border-color: rgb(255 255 255 / 0.08); background: rgb(255 255 255 / 0.08); color: hsl(210 40% 98%); transform: translateX(2px); }
-.guru-nav-item-active { border-color: hsl(var(--guru-turquoise) / 0.45); background: linear-gradient(90deg, hsl(var(--guru-turquoise) / 0.28), hsl(var(--guru-sapphire) / 0.2)); color: hsl(210 40% 98%); box-shadow: inset 3px 0 0 hsl(var(--guru-yellow)); }
+.guru-nav-item:hover { border-color: hsl(var(--guru-gold) / 0.3); background: rgb(255 255 255 / 0.08); color: hsl(210 40% 98%); transform: translateX(2px); }
+.guru-nav-item-active { border-color: hsl(var(--guru-gold) / 0.5); background: linear-gradient(90deg, hsl(var(--guru-slate) / 0.38), hsl(var(--guru-slate) / 0.12)); color: hsl(210 40% 98%); box-shadow: inset 3px 0 0 hsl(var(--guru-gold)); }
+.guru-nav-child { border-radius: 10px; border-left: 2px solid rgb(255 255 255 / 0.14); }
+.guru-nav-child-active { border-left-color: hsl(var(--guru-gold)); background: hsl(var(--guru-turquoise) / 0.22); color: hsl(45 90% 64%); }
 
 :root {
   --ortu-silver: 0 0% 76%;
