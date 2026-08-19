@@ -1,42 +1,56 @@
-# Rencana Tampilan Ruang Belajar Siswa Kelas 7
+# Rencana: Dasbor Orang Tua (MIRAI)
 
 ## Context
-Pengguna memberikan referensi UI ruang belajar dengan layout dua panel: materi guru di kiri dan AI Tutor MIRAI di kanan, plus header progres level, urutan belajar, waktu sesi, dan footer progres. Layout yang sama harus digunakan untuk Kelompok Penjelajah maupun Pengintai. Fokus materi yang digunakan saat ini adalah **Jenis-Jenis Garis**, tetap dalam konteks SMP kelas 7.
+Pengguna ingin membangun dasbor orang tua di ekosistem MIRAI. Saat ini halaman Index (`src/pages/Index.tsx`) sudah punya kartu peran "Orang Tua" tetapi hanya menampilkan `window.alert` saat login. Dasbor orang tua perlu: menu sidebar modern (Dashboard, Profil Anak, Perkembangan Siswa, Angket Kinerja, Infografis, Catatan Guru, Pengaturan) dengan highlight menu aktif berwarna **silver-cream-yellow-brown**.
 
-## Pendekatan yang direkomendasikan
-- Membuat halaman ruang belajar baru `src/pages/siswa/RuangBelajar.tsx` dengan layout responsif dua kolom yang mengikuti referensi.
-- Memakai top header berisi breadcrumb Kelas/Sesi Aktif, status berlangsung, judul **Jenis-Jenis Garis**, subtopik, level siswa, urutan materi, dan timer sesi demo.
-- Panel kiri “Materi Guru” berisi tab Ringkasan, Dokumen, Video, Presentasi; tab Ringkasan aktif menampilkan konsep garis sejajar, berpotongan, tegak lurus, dan transversal, serta diagram garis berbasis SVG/CSS.
-- Panel kiri juga menampilkan kartu “Ciri-ciri” dan “Konsep Penting”, serta daftar sumber materi demo dengan tombol buka/putar non-backend.
-- Panel kanan “AI Tutor MIRAI” berisi chat demo, quick prompts topik Jenis-Jenis Garis, respons penjelasan, dan input pesan visual; belum terhubung AI backend.
-- Footer menampilkan level, progres XP, target hari ini, dan tombol daftar semua level.
-- Menjaga tampilan identik untuk kedua kelompok; label kelompok hanya ditampilkan sebagai badge kecil bila data kelompok tersedia, tidak mengubah layout atau materi.
-- Menghubungkan halaman ini dari hasil/ruang kelas siswa dengan topik Jenis-Jenis Garis tanpa menghapus kuis dan AI Tutor demo yang sudah ada.
+Mengikuti pola dasbor yang sudah ada di proyek (GuruDashboard dengan komponen Sidebar/Topbar/MobileDrawer, dan halaman-halaman di `src/pages/guru/`). Data tetap demo (sesuai pola aplikasi saat ini, backend belum aktif).
 
-## File kritis
-- `src/pages/siswa/RuangBelajar.tsx`: halaman dua panel baru.
-- `src/pages/SiswaDashboard.tsx`: state route internal untuk membuka ruang belajar.
-- `src/pages/siswa/RuangKelasAktif.tsx`: tombol lanjutan menuju ruang belajar setelah hasil kuis.
-- `src/data/siswaDashboardData.ts`: identitas siswa, kelas VII-A, dan progres demo.
+## Pendekatan
+1. **Token warna baru** di `src/index.css` untuk palet orang tua (silver, cream, gold, brown) + kelas sidebar `ortu-*` dengan highlight aktif bergradien silver→cream dan aksen garis kuning di kiri.
+2. **Route baru** `/orangtua` di `src/router.tsx` → `OrangtuaDashboard`.
+3. **Login Index.tsx**: peran "Orang Tua" (key `ortu`) → `navigate("/orangtua")` (bukan alert lagi).
+4. **Halaman baru**:
+   - `src/pages/OrangtuaDashboard.tsx` — kerangka utama (sidebar + topbar + konten switch), menu 7 item dengan ikon lucide.
+   - `src/pages/orangtua/Beranda.tsx` — halaman Dashboard dengan konten relevan untuk orang tua (ringkasan anak, statistik, akses cepat, catatan guru, jadwal).
+   - `src/pages/orangtua/PlaceholderPage.tsx` — placeholder "dalam pengembangan" untuk 6 halaman lainnya.
+5. Sidebar modern: latar gelap hangat, item aktif memakai highlight **silver-cream** dengan teks cokelat dan aksen kuning; responsif (drawer mobile).
+
+## File yang diubah/dibuat
+- **Edit** `src/index.css` — token `--ortu-silver`, `--ortu-cream`, `--ortu-gold`, `--ortu-brown` + kelas `.ortu-sidebar`, `.ortu-nav-item`, `.ortu-nav-item-active`.
+- **Edit** `src/router.tsx` — tambah route `/orangtua`.
+- **Edit** `src/pages/Index.tsx` — login `ortu` → `navigate("/orangtua")`.
+- **Buat** `src/pages/OrangtuaDashboard.tsx` — shell + sidebar + topbar + switch konten.
+- **Buat** `src/pages/orangtua/Beranda.tsx` — halaman Dashboard.
+- **Buat** `src/pages/orangtua/PlaceholderPage.tsx` — halaman pengganti.
+
+## Menu sidebar
+| id | label | ikon (lucide) |
+|---|---|---|
+| dashboard | Dashboard | LayoutDashboard |
+| profil-anak | Profil Anak | UserRound |
+| perkembangan | Perkembangan Siswa | TrendingUp |
+| angket-kinerja | Angket Kinerja | ClipboardList |
+| infografis | Infografis | BarChart3 |
+| catatan-guru | Catatan Guru | MessageSquareText |
+| pengaturan | Pengaturan | Settings |
+
+## Detail desain
+- Sidebar: `background: linear-gradient(180deg, hsl(30 45% 15%), hsl(30 42% 11%))` (cokelat gelap hangat), teks putih/cream.
+- Item aktif: `background: linear-gradient(90deg, hsl(0 0% 88%), hsl(45 100% 94%))` (silver→cream), teks `hsl(27 48% 31%)` (brown), `box-shadow: inset 3px 0 0 hsl(43 91% 55%)` (yellow).
+- Beranda: hero kartu anak (nama, kelas VII-A, sekolah), kartu statistik (streak, poin, daya juang), akses cepat ke submenu, daftar catatan guru terbaru + jadwal (data demo di dalam komponen, sesuai pola `src/data/siswaDashboardData.ts`).
 
 ## Implementation checklist
-- [ ] Tambahkan header sesi aktif dengan judul Jenis-Jenis Garis dan status berlangsung.
-- [ ] Tambahkan panel materi guru dengan tab ringkasan/dokumen/video/presentasi.
-- [ ] Tambahkan diagram visual empat jenis garis menggunakan SVG/CSS tanpa gambar eksternal.
-- [ ] Tambahkan kartu ciri-ciri dan konsep penting dengan istilah kelas 7.
-- [ ] Tambahkan daftar sumber materi demo dan tombol aksi lokal.
-- [ ] Tambahkan panel AI Tutor dengan quick prompts serta chat demo yang dapat menambah pesan lokal.
-- [ ] Tambahkan footer progres level, XP, target harian, dan daftar level.
-- [ ] Pastikan layout sama untuk Penjelajah dan Pengintai.
-- [ ] Hubungkan tombol materi/hasil kelas aktif ke halaman ruang belajar topik Jenis-Jenis Garis.
-- [ ] Pastikan responsive mobile berubah menjadi susunan vertikal tanpa overflow.
+- [ ] Tambah token warna `ortu-*` dan kelas `.ortu-sidebar`, `.ortu-nav-item`, `.ortu-nav-item-active` di `src/index.css`.
+- [ ] Tambah import + route `{path:"/orangtua"}` di `src/router.tsx`.
+- [ ] Ubah `LoginModal.submit` di `src/pages/Index.tsx`: `role.key === "ortu"` → `navigate("/orangtua")`.
+- [ ] Buat `src/pages/orangtua/PlaceholderPage.tsx` (ikon + judul + teks pengembangan, gaya konsisten).
+- [ ] Buat `src/pages/orangtua/Beranda.tsx` dengan hero anak, statistik, akses cepat, catatan guru, jadwal (demo).
+- [ ] Buat `src/pages/OrangtuaDashboard.tsx`: 7 menu (id/label/ikon), switch konten, sidebar highlight aktif silver-cream-yellow-brown, topbar dengan breadcrumb, drawer mobile, tombol keluar ke `/`.
+- [ ] Pastikan semua ikon dari lucide-react (tanpa emoji).
 
 ## Verification checklist
-- [ ] Verifikasi halaman menampilkan judul dan materi Jenis-Jenis Garis saja.
-- [ ] Verifikasi quick prompt AI Tutor mengubah/menambah percakapan lokal.
-- [ ] Verifikasi tab materi dapat berpindah dan tab non-ringkasan menampilkan placeholder sumber.
-- [ ] Verifikasi diagram menampilkan garis sejajar, berpotongan, tegak lurus, dan transversal.
-- [ ] Verifikasi tampilan tidak berubah berdasarkan kelompok Penjelajah/Pengintai.
-- [ ] Verifikasi tombol keluar sesi kembali ke Ruang Kelas atau Beranda.
-- [ ] Verifikasi layout desktop dua panel dan mobile satu kolom.
-- [ ] Jalankan lint dan build melalui workflow framework setelah implementasi.
+- [ ] Buka `http://localhost:3000/orangtua` → dasbor orang tua tampil, menu aktif "Dashboard" berhighlight silver-cream-yellow-brown.
+- [ ] Klik tiap menu → konten berpindah; "Dashboard" menampilkan Beranda, menu lain menampilkan placeholder.
+- [ ] Login lewat `http://localhost:3000` kartu "Orang Tua" → mengarah ke `/orangtua` (bukan alert).
+- [ ] Responsif: di layar sempit sidebar jadi drawer (tombol menu di topbar).
+- [ ] `pnpm run build` berhasil tanpa error TypeScript/lint.
