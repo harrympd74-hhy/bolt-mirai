@@ -1,24 +1,24 @@
 import { useState } from "react";
 import { ArrowLeft, ArrowRight, BookOpen, Check, Lightbulb, Target, TrendingUp, Trophy, X } from "lucide-react";
 
-type Topic = "Bangun Ruang Segitiga" | "Jenis-Jenis Garis";
+type Topic = "Sudut" | "Garis-Garis Sejajar";
 type Phase = "LOT" | "HOT" | "UP HOT";
 type TutorStep = { phase: Phase; prompt: string; options?: string[]; correct?: number; hint?: string; explanation?: string };
 
 const questions: Record<Topic, TutorStep[]> = {
-  "Bangun Ruang Segitiga": [
-    { phase: "LOT", prompt: "Bangun ruang yang memiliki dua sisi berbentuk segitiga yang sejajar dan sisi tegak berbentuk persegi panjang disebut...", options: ["Prisma segitiga", "Limas segiempat", "Tabung", "Bola"], correct: 0, explanation: "Prisma segitiga memiliki dua alas segitiga yang kongruen dan sejajar." },
-    { phase: "LOT", prompt: "Sebuah prisma segitiga memiliki alas segitiga dengan alas 6 cm dan tinggi 4 cm. Berapa luas alasnya?", options: ["10 cm²", "12 cm²", "24 cm²", "48 cm²"], correct: 1, explanation: "Luas segitiga = ½ × alas × tinggi = ½ × 6 × 4 = 12 cm²." },
-    { phase: "HOT", prompt: "Prisma segitiga memiliki luas alas 12 cm² dan panjang prisma 10 cm. Berapa volumenya?", options: ["22 cm³", "60 cm³", "120 cm³", "240 cm³"], correct: 2, hint: "Volume prisma = luas alas × panjang prisma.", explanation: "Volume = 12 × 10 = 120 cm³." },
-    { phase: "HOT", prompt: "Alas prisma segitiga memiliki sisi 3 cm, 4 cm, dan 5 cm. Jika panjang prisma 8 cm, berapa luas permukaannya?", options: ["96 cm²", "112 cm²", "120 cm²", "144 cm²"], correct: 1, hint: "Luas permukaan = 2 × luas alas + keliling alas × panjang prisma.", explanation: "Alasnya segitiga siku-siku: luas 6 cm². LP = 2×6 + (3+4+5)×8 = 108 cm². Periksa kembali langkah dan satuanmu." },
-    { phase: "UP HOT", prompt: "Kamu membuat kemasan prisma segitiga dengan luas alas 15 cm² dan panjang 12 cm. Jika bahan dilebihkan 10%, berapa minimal volume bahan yang perlu disiapkan?", options: ["180 cm³", "198 cm³", "210 cm³", "216 cm³"], correct: 1, hint: "Hitung volume terlebih dahulu, lalu tambahkan 10%.", explanation: "Volume awal 15×12 = 180 cm³. Dengan tambahan 10%, 180×1,1 = 198 cm³." },
+  "Sudut": [
+    { phase: "LOT", prompt: "Sudut yang besarnya kurang dari 90° disebut sudut...", options: ["Lancip", "Siku-siku", "Tumpul", "Refleks"], correct: 0, explanation: "Sudut lancip besarnya antara 0° dan 90°." },
+    { phase: "LOT", prompt: "Dua garis berpotongan membentuk sudut 35°. Berapa besar sudut bertolak belakangnya?", options: ["35°", "55°", "90°", "145°"], correct: 0, explanation: "Sudut bertolak belakang selalu memiliki besar yang sama." },
+    { phase: "HOT", prompt: "Sebuah sudut siku-siku dibagi menjadi dua bagian sama besar. Berapa besar tiap bagiannya?", options: ["45°", "90°", "60°", "30°"], correct: 0, hint: "Sudut siku-siku besarnya 90°, lalu bagi menjadi dua.", explanation: "90° ÷ 2 = 45°." },
+    { phase: "HOT", prompt: "Pada dua garis yang berpotongan, salah satu sudutnya 120°. Besar sudut yang bertolak belakang dengannya adalah...", options: ["120°", "60°", "240°", "30°"], correct: 0, hint: "Ingat sifat sudut bertolak belakang.", explanation: "Sudut bertolak belakang sama besar, jadi 120°." },
+    { phase: "UP HOT", prompt: "Jarum jam pada pukul 03.00 membentuk sudut siku-siku. Berapa besar sudut yang dibentuk jarum jam pada pukul 06.00?", options: ["180°", "90°", "45°", "0°"], correct: 0, hint: "Pukul 06.00 kedua jarum membentuk garis lurus.", explanation: "Pukul 06.00 jarum jam membentuk sudut lurus sebesar 180°." },
   ],
-  "Jenis-Jenis Garis": [
-    { phase: "LOT", prompt: "Dua garis yang tidak pernah bertemu walaupun diperpanjang disebut garis...", options: ["Berpotongan", "Tegak lurus", "Sejajar", "Transversal"], correct: 2, explanation: "Garis sejajar selalu berjarak sama dan tidak berpotongan." },
-    { phase: "LOT", prompt: "Dua garis yang membentuk sudut 90° disebut garis...", options: ["Sejajar", "Tegak lurus", "Berimpit", "Lengkung"], correct: 1, explanation: "Garis tegak lurus membentuk sudut siku-siku 90°." },
-    { phase: "HOT", prompt: "Sebuah garis memotong dua garis sejajar. Garis yang memotong tersebut disebut garis...", options: ["Transversal", "Sejajar", "Berimpit", "Diagonal"], correct: 0, explanation: "Garis transversal memotong dua garis atau lebih pada titik yang berbeda." },
-    { phase: "HOT", prompt: "Jika dua garis berpotongan membentuk sudut 35°, berapa besar sudut bertolak belakangnya?", options: ["35°", "55°", "90°", "145°"], correct: 0, hint: "Sudut bertolak belakang memiliki besar yang sama.", explanation: "Sudut bertolak belakang selalu sama besar, jadi jawabannya 35°." },
-    { phase: "UP HOT", prompt: "Kamu merancang pola ubin: garis A dan B harus sejajar, sedangkan garis C harus memotong keduanya dengan sudut 90°. Hubungan C terhadap A dan B adalah...", options: ["C sejajar A dan B", "C tegak lurus A dan B", "C berimpit dengan A", "C tidak berhubungan"], correct: 1, hint: "Perhatikan syarat sudut 90° pada kedua garis.", explanation: "Jika C membentuk sudut 90° terhadap A dan B, C tegak lurus terhadap keduanya." },
+  "Garis-Garis Sejajar": [
+    { phase: "LOT", prompt: "Dua garis yang tidak pernah bertemu walaupun diperpanjang disebut garis...", options: ["Sejajar", "Berpotongan", "Tegak lurus", "Transversal"], correct: 0, explanation: "Garis sejajar selalu berjarak sama dan tidak berpotongan." },
+    { phase: "LOT", prompt: "Garis yang memotong dua garis sejajar pada titik yang berbeda disebut garis...", options: ["Transversal", "Sejajar", "Berimpit", "Lengkung"], correct: 0, explanation: "Garis transversal memotong dua garis atau lebih pada titik yang berbeda." },
+    { phase: "HOT", prompt: "Dua garis sejajar dipotong garis transversal sehingga terbentuk sudut sehadap 60°. Besar sudut sehadap pada titik potong lainnya adalah...", options: ["60°", "120°", "90°", "30°"], correct: 0, hint: "Perhatikan sifat sudut sehadap.", explanation: "Sudut sehadap pada dua garis sejajar selalu sama besar, jadi 60°." },
+    { phase: "HOT", prompt: "Sudut dalam sepihak pada dua garis sejajar yang dipotong garis transversal memiliki jumlah...", options: ["180°", "90°", "360°", "60°"], correct: 0, hint: "Sudut dalam sepihak saling berpelurus.", explanation: "Sudut dalam sepihak berjumlah 180°." },
+    { phase: "UP HOT", prompt: "Kamu merancang jalur rel: rel A dan B harus sejajar, sedangkan rel penghubung C memotong keduanya dengan sudut 90°. Besar sudut sehadap yang terbentuk adalah...", options: ["90°", "180°", "45°", "60°"], correct: 0, hint: "Perhatikan bahwa C tegak lurus terhadap A dan B.", explanation: "Karena C tegak lurus, sudut sehadap yang terbentuk juga 90°." },
   ],
 };
 
