@@ -170,4 +170,21 @@
 .guru-nav-item:hover { border-color: rgb(255 255 255 / 0.08); background: rgb(255 255 255 / 0.08); color: hsl(210 40% 98%); transform: translateX(2px); }
 .guru-nav-item-active { border-color: hsl(var(--guru-turquoise) / 0.45); background: linear-gradient(90deg, hsl(var(--guru-turquoise) / 0.28), hsl(var(--guru-sapphire) / 0.2)); color: hsl(210 40% 98%); box-shadow: inset 3px 0 0 hsl(var(--guru-yellow)); }
 
+:root {
+  --ortu-silver: 0 0% 76%;
+  --ortu-silver-soft: 0 0% 90%;
+  --ortu-cream: 45 100% 94%;
+  --ortu-cream-soft: 42 60% 88%;
+  --ortu-gold: 43 91% 55%;
+  --ortu-gold-soft: 45 100% 91%;
+  --ortu-brown: 27 48% 31%;
+  --ortu-brown-deep: 30 45% 15%;
+}
+.ortu-sidebar { background: linear-gradient(180deg, hsl(var(--ortu-brown-deep)) 0%, hsl(30 42% 11%) 100%); color: hsl(210 40% 98%); }
+.ortu-nav-item { display: flex; width: 100%; min-height: 44px; align-items: center; gap: 12px; margin: 3px 0; border: 1px solid transparent; border-radius: 12px; color: hsl(40 40% 88% / 0.72); text-align: left; font-size: 13px; transition: background 160ms ease, color 160ms ease, border-color 160ms ease, transform 160ms ease; }
+.ortu-nav-item:hover { border-color: hsl(var(--ortu-gold) / 0.25); background: rgb(255 255 255 / 0.07); color: hsl(210 40% 98%); transform: translateX(2px); }
+.ortu-nav-item-active { border-color: hsl(var(--ortu-gold) / 0.5); background: linear-gradient(90deg, hsl(var(--ortu-silver-soft)), hsl(var(--ortu-cream))); color: hsl(var(--ortu-brown)); box-shadow: inset 3px 0 0 hsl(var(--ortu-gold)), 0 4px 14px rgb(0 0 0 / 0.25); }
+.ortu-nav-item-active .ortu-nav-icon { color: hsl(var(--ortu-brown)); }
+.ortu-hero { background: linear-gradient(135deg, hsl(var(--ortu-brown-deep)) 0%, hsl(32 48% 22%) 55%, hsl(35 42% 30%) 100%); }
+
 @media (prefers-reduced-motion: reduce) { *, *::before, *::after { scroll-behavior: auto !important; animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; } }

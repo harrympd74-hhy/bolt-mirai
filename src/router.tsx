@@ -1,6 +1,7 @@
 import AdminDashboard from "./pages/AdminDashboard";
 import GuruDashboard from "./pages/GuruDashboard";
 import SiswaDashboard from "./pages/SiswaDashboard";
+import OrangtuaDashboard from "./pages/OrangtuaDashboard";
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
 
@@ -24,6 +25,11 @@ export const routers = [
     path: "/siswa",
     name: "siswa",
     element: <SiswaDashboard />,
+  },
+  {
+    path: "/orangtua",
+    name: "orangtua",
+    element: <OrangtuaDashboard />,
   },
   /* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */
   {
