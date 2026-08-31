@@ -3442,6 +3442,48 @@ export type Database = {
         }
         Relationships: []
       }
+      sync_runs: {
+        Row: {
+          branch: string
+          commit_sha: string | null
+          completed_at: string | null
+          error_message: string | null
+          files_processed: number
+          id: string
+          records_imported: number
+          repository: string
+          source: string
+          started_at: string
+          status: string
+        }
+        Insert: {
+          branch?: string
+          commit_sha?: string | null
+          completed_at?: string | null
+          error_message?: string | null
+          files_processed?: number
+          id?: string
+          records_imported?: number
+          repository: string
+          source?: string
+          started_at?: string
+          status: string
+        }
+        Update: {
+          branch?: string
+          commit_sha?: string | null
+          completed_at?: string | null
+          error_message?: string | null
+          files_processed?: number
+          id?: string
+          records_imported?: number
+          repository?: string
+          source?: string
+          started_at?: string
+          status?: string
+        }
+        Relationships: []
+      }
       teacher_accounts: {
         Row: {
           account_type: string
