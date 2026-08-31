@@ -1,54 +1,35 @@
-# Rencana: Modul Jadwal Terhubung Guru dan Siswa
+# Rencana: Hubungkan Menu Siswa ke Ruang Guru dan Jadwal Semester
 
 ## Context
-Dasbor admin MIRAI saat ini memiliki menu jadwal tetapi masih berupa placeholder. Dasbor guru dan siswa juga menampilkan konten jadwal demo lokal. Pengguna meminta admin dapat membangun jadwal yang terhubung dengan guru dan siswa, sehingga satu jadwal berdasarkan kelas dapat terlihat oleh guru terkait dan seluruh siswa pada kelas tersebut.
+Dasbor siswa sudah memiliki menu jadwal, ruang kelas, dan ruang belajar, tetapi klik menu jadwal semester masih masuk placeholder dan ruang siswa belum memiliki jalur yang jelas ke ruang pembelajaran yang digunakan guru. Pengguna meminta Ruang Pertemuan siswa terhubung ke ruang pembelajaran guru, serta Jadwal Semester memakai data jadwal yang sama dengan jadwal pada beranda siswa.
 
 ## Pendekatan
-1. Buat tabel `class_schedules` di backend dengan RLS aktif: kelas, mata pelajaran, guru, hari, jam mulai/selesai, ruang, semester, status, dan timestamps. Jadwal mengacu ke `teacher_profiles` bila guru tersedia; kelas menjadi penghubung ke `student_profiles.class_name`.
-2. Buat backend function `schedule-management` untuk operasi admin CRUD dan pembacaan jadwal terfilter:
-   - admin dapat membuat, mengedit, menghapus, dan mempublikasikan jadwal;
-   - guru hanya menerima jadwal yang terkait akun/profil gurunya;
-   - siswa hanya menerima jadwal berdasarkan `class_name` profil/akun siswa;
-   - semua role diverifikasi di backend, bukan dari pilihan role client.
-3. Tambahkan validasi bentrok: guru tidak boleh memiliki dua jadwal beririsan pada hari/jam yang sama, dan kelas tidak boleh memiliki dua mata pelajaran beririsan. Pesan konflik harus dikembalikan sebelum mutation.
-4. Buat komponen admin `ScheduleManagement` dengan tampilan mingguan, filter kelas/guru, form jadwal, pilihan guru dari data profil yang ada, dan aksi edit/hapus/publikasi. Menu placeholder jadwal admin diarahkan ke komponen ini.
-5. Tambahkan komponen jadwal reusable untuk dasbor guru dan siswa. Guru melihat jadwal mengajarnya; siswa melihat jadwal kelasnya. Pertahankan fallback demo hanya saat sesi autentikasi belum tersedia, dengan label jelas bahwa data tersebut demo.
-6. Jangan memasukkan password, token, atau data sensitif ke JSON GitHub; data jadwal operasional disimpan di backend.
+1. Pertahankan `ScheduleList` sebagai sumber tampilan jadwal bersama dan gunakan komponen itu untuk halaman/menu `Jadwal Semester`, sehingga data yang tampil identik dengan jadwal pada beranda siswa.
+2. Tambahkan halaman siswa khusus `StudentSchedulePage` yang menampilkan jadwal semester lengkap, state loading/kosong/demo, dan tombol masuk ke ruang pertemuan berdasarkan jadwal yang dipilih.
+3. Ubah menu sidebar siswa menjadi `Ruang Pertemuan` dan arahkan kliknya ke ruang pembelajaran aktif (`RuangKelasAktif`), bukan placeholder. Ruang pertemuan membawa topik dan identitas kelas yang sama dengan ruang belajar guru.
+4. Tambahkan navigasi/CTA yang konsisten dari kartu jadwal siswa ke ruang pertemuan. Untuk mode demo, gunakan kelas VII-A dan materi yang sudah tersedia; untuk sesi Auth nyata, data jadwal backend tetap menjadi sumber otoritatif.
+5. Jangan mengubah alur admin. Perubahan hanya pada dasbor siswa dan komponen jadwal/ruang yang dipakai bersama.
 
 ## File yang dibuat/diubah
-- Migration melalui `supabase_migration`: tabel `class_schedules`, foreign key/index, RLS/policy.
-- `supabase/functions/schedule-management/index.ts`: CRUD admin, query role-based, validasi konflik.
-- `src/components/admin/ScheduleManagement.tsx`: kalender/list mingguan dan form admin.
-- `src/components/shared/ScheduleList.tsx`: daftar jadwal reusable.
-- `src/pages/AdminDashboard.tsx`: sambungkan menu jadwal dan subhalaman input/daftar.
-- `src/pages/GuruDashboard.tsx` dan/atau `src/pages/guru/Beranda.tsx`: jadwal guru dari backend.
-- `src/pages/SiswaDashboard.tsx`: jadwal siswa dari backend.
-- `src/integrations/supabase/types.ts`: hanya regenerated otomatis oleh migrasi, tidak diedit manual.
-
-## Batasan keamanan
-- RLS aktif di migration yang membuat tabel.
-- Admin check dan ownership/class filtering dilakukan backend/RLS.
-- Siswa tidak dapat melihat jadwal kelas lain; guru tidak dapat mengubah jadwal dari dasbornya.
-- Demo login tidak mendapatkan akses operasi backend; jadwal admin dan data nyata memerlukan sesi Auth admin.
+- `src/pages/SiswaDashboard.tsx`: menu Ruang Pertemuan, routing internal Jadwal Semester, dan routing ruang belajar.
+- `src/pages/siswa/StudentSchedulePage.tsx`: halaman jadwal semester siswa menggunakan `ScheduleList`.
+- `src/components/shared/ScheduleList.tsx`: opsional menambahkan callback pilih jadwal dan tombol ruang pertemuan.
+- `src/pages/siswa/RuangKelasAktif.tsx`: menerima konteks jadwal/kelas bila diperlukan agar ruang siswa sesuai jadwal guru.
 
 ## Implementation checklist
-- [ ] Buat migration `class_schedules` dengan RLS, foreign key guru, dan index kelas/hari/waktu.
-- [ ] Verifikasi schema dan policy RLS setelah migration.
-- [ ] Implementasikan backend function `schedule-management` dengan aksi list, create, update, delete, publish.
-- [ ] Tambahkan validasi input tanggal/jam/semester dan bentrok guru/kelas sebelum insert/update.
-- [ ] Buat UI admin jadwal dengan form pilihan guru, kelas, mata pelajaran, hari, jam, ruang, semester, dan status.
-- [ ] Hubungkan menu `jadwalPembelajaran` dan `inputJadwal` di `AdminDashboard`.
-- [ ] Buat `ScheduleList` reusable dan hubungkan query jadwal ke GuruDashboard serta SiswaDashboard.
-- [ ] Sediakan state loading, error, kosong, dan fallback demo yang diberi label.
+- [ ] Tambahkan label/menu `Ruang Pertemuan` pada sidebar siswa dan arahkan ke state ruang kelas aktif.
+- [ ] Buat `StudentSchedulePage` dengan `ScheduleList` sebagai sumber data yang sama dengan beranda siswa.
+- [ ] Hubungkan klik `Jadwal Semester` ke `StudentSchedulePage`, bukan placeholder.
+- [ ] Hubungkan klik `Ruang Pertemuan` ke `RuangKelasAktif` dengan topik dan kelas VII-A demo.
+- [ ] Tambahkan tombol masuk ruang pertemuan pada item jadwal bila konteks jadwal tersedia.
+- [ ] Pertahankan fallback demo tanpa menampilkan data palsu sebagai data backend nyata.
 - [ ] Jalankan `pnpm run check` dan `pnpm run build`.
 
 ## Verification checklist
-- [ ] Admin dapat membuat jadwal valid dan jadwal muncul pada daftar mingguan.
-- [ ] Admin dapat mengedit, mempublikasikan, dan menghapus jadwal.
-- [ ] Bentrok jadwal guru ditolak dengan pesan yang menyebut jadwal bentrok.
-- [ ] Bentrok kelas ditolak dengan pesan yang menyebut kelas dan waktu.
-- [ ] Guru hanya melihat jadwal yang terhubung ke akun/profilnya.
-- [ ] Siswa hanya melihat jadwal berdasarkan kelasnya.
-- [ ] Pengguna non-admin tidak dapat menjalankan CRUD admin dan menerima 403.
-- [ ] Jadwal tidak dipindahkan ke GitHub JSON dan tidak memuat password/token.
+- [ ] Klik `Jadwal Pelajaran > Jadwal Semester` menampilkan jadwal yang sama dengan kartu jadwal beranda siswa.
+- [ ] Klik `Ruang Pertemuan` membuka ruang pembelajaran aktif, bukan halaman placeholder.
+- [ ] Jadwal yang dipilih dapat membawa siswa ke ruang pembelajaran yang sesuai.
+- [ ] Navigasi mobile dan desktop menutup sidebar setelah pilihan dibuat.
+- [ ] State kosong dan fallback demo tetap tampil jelas.
+- [ ] Dasbor guru dan admin tidak mengalami perubahan perilaku yang tidak diminta.
 - [ ] `pnpm run check` dan `pnpm run build` berhasil.
