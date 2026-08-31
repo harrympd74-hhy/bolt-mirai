@@ -101,7 +101,7 @@ export default function Index() {
                   <div className="relative rounded-full p-[3.5px] bg-gradient-to-tr from-cyan-400 via-emerald-400 to-amber-400 shadow-lg">
                     <img src={person.image} alt={person.name} className="h-24 w-24 sm:h-28 sm:w-28 rounded-full object-cover bg-card" crossOrigin="anonymous" />
                   </div>
-                  <p className="mt-2 text-[11px] font-bold leading-tight text-slate-900 max-w-[130px] text-center">{person.name}</p>
+                  <p className="mt-2 whitespace-nowrap text-center text-[9px] font-bold leading-tight text-slate-900 sm:text-[10px]">{person.name}</p>
                   <p className="mt-1 text-[10px] text-muted-foreground">{person.role}</p>
                 </div>
               ))}
