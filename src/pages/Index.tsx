@@ -5,12 +5,17 @@ import { Eye, EyeOff, LockKeyhole, X } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import AdminLoginModal from "../components/AdminLoginModal";
 
-const team = [
-  { name: "Prof. Dr.H. Tatang Herman, M.Ed.", role: "Promotor", image: "https://cdn.enter.pro/resources/uid_100054821/28afbca4-8ad2-4d.png" },
+const promotors = [
+  { name: "Prof. Dr. H. Tatang Herman, M.Ed.", role: "Promotor", image: "https://cdn.enter.pro/resources/uid_100054821/28afbca4-8ad2-4d.png" },
   { name: "Prof. Dr. H. Sufyani Prabawanto, M.Ed.", role: "Ko-Promotor 1", image: "https://cdn.enter.pro/resources/uid_100054821/3eeb0c02-89cc-40.png" },
   { name: "Prof. Al Jupri, S.Pd., M.Sc., Ph.D.", role: "Ko-Promotor 2", image: "https://cdn.enter.pro/resources/uid_100054821/3d6251a9-2096-41.png" },
-  { name: "Yuni Suryaningsih", role: "Peneliti", image: "https://grazia-prod.oss-ap-southeast-1.aliyuncs.com/resources/uid_100050201/e6b0c657-762d-49.png" },
 ];
+
+const peneliti = {
+  name: "Yuni Suryaningsih",
+  role: "Peneliti",
+  image: "https://grazia-prod.oss-ap-southeast-1.aliyuncs.com/resources/uid_100050201/e6b0c657-762d-49.png",
+};
 
 const roles = [
   { title: "Guru", desc: "Kelola pembelajaran & administrasi kelas", key: "guru", image: "https://grazia-prod.oss-ap-southeast-1.aliyuncs.com/resources/uid_100050201/798ab757-3198-4d.png", from: "#10b981", to: "#0d9488" },
@@ -77,7 +82,31 @@ export default function Index() {
   return <main className="mirai-page relative min-h-screen overflow-hidden font-sans text-foreground">
     <div className="mirai-background" aria-hidden="true"><div className="mirai-grid" /><div className="mirai-orb mirai-orb-one" /><div className="mirai-orb mirai-orb-two" /><div className="mirai-orb mirai-orb-three" /><div className="mirai-ring mirai-ring-one" /><div className="mirai-ring mirai-ring-two" />{["12%", "55%", "80%", "8%", "65%", "90%"].map((left, index) => <motion.span key={left} className="mirai-dot" style={{ left, top: `${15 + index * 13}%` }} animate={{ y: [0, -10, 0], opacity: [0.35, 0.9, 0.35] }} transition={{ duration: 3 + index * 0.5, repeat: Infinity, delay: index * 0.3 }} />)}</div>
     <div className="relative z-10 grid min-h-screen grid-cols-1 lg:grid-cols-[42%_58%]">
-      <section className="flex items-center justify-center px-6 py-12 sm:px-10 lg:py-16"><div className="w-full max-w-2xl text-center"><motion.img initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.6 }} src="https://grazia-prod.oss-ap-southeast-1.aliyuncs.com/resources/uid_100050201/03d27ec3-8a8f-4d.png" alt="Logo Sekolah" className="mx-auto mb-6 h-24 w-24 rounded-full bg-card object-contain p-2 shadow-xl ring-4 ring-card/70" crossOrigin="anonymous" /><motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}><div className="flex items-center justify-center gap-3"><span className="text-right text-xs font-bold leading-snug tracking-[0.18em] text-muted-foreground">SELAMAT<br />DATANG DI</span><span className="mirai-title">MIRAI</span></div><p className="mt-3 text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">Ekosistem pembelajaran digital cerdas</p></motion.div><motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="mt-10"><p className="mb-5 text-[11px] font-semibold uppercase tracking-[0.28em] text-muted-foreground">Tim riset</p><div className="flex flex-wrap items-start justify-center gap-x-5 gap-y-6">{team.map((person, index) => <div key={person.name} className={`flex flex-col items-center gap-2 ${index === 3 ? "basis-full" : ""}`}><img src={person.image} alt={person.name} className={`h-32 w-32 object-contain ${index === 3 ? "rounded-full object-cover ring-4 ring-card shadow-lg" : ""}`} crossOrigin="anonymous" /><p className="whitespace-nowrap text-center text-[10px] font-semibold leading-tight text-foreground">{person.name}</p><p className="text-[10px] text-muted-foreground">{person.role}</p></div>)}</div></motion.div></div></section>
+      <section className="flex items-center justify-center px-6 py-12 sm:px-10 lg:py-16"><div className="w-full max-w-2xl text-center"><motion.img initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.6 }} src="https://grazia-prod.oss-ap-southeast-1.aliyuncs.com/resources/uid_100050201/03d27ec3-8a8f-4d.png" alt="Logo Sekolah" className="mx-auto mb-6 h-24 w-24 rounded-full bg-card object-contain p-2 shadow-xl ring-4 ring-card/70" crossOrigin="anonymous" /><motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.15 }}><div className="flex items-center justify-center gap-3"><span className="text-right text-xs font-bold leading-snug tracking-[0.18em] text-muted-foreground">SELAMAT<br />DATANG DI</span><span className="mirai-title">MIRAI</span></div><p className="mt-3 text-[10px] font-semibold uppercase tracking-[0.16em] text-muted-foreground">Ekosistem pembelajaran digital cerdas</p></motion.div>          <motion.div initial={{ opacity: 0, y: 15 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.3 }} className="mt-8 space-y-6">
+            <p className="text-center text-[11px] font-semibold uppercase tracking-[0.28em] text-muted-foreground">Tim riset</p>
+
+            {/* Row 1: Peneliti (Top Center) */}
+            <div className="flex flex-col items-center justify-center text-center">
+              <div className="relative rounded-full p-[3px] bg-white shadow-xl ring-4 ring-white/80">
+                <img src={peneliti.image} alt={peneliti.name} className="h-28 w-28 rounded-full object-cover" crossOrigin="anonymous" />
+              </div>
+              <p className="mt-2 text-xs font-bold leading-tight text-slate-900">{peneliti.name}</p>
+              <p className="mt-0.5 text-[10px] text-muted-foreground">{peneliti.role}</p>
+            </div>
+
+            {/* Row 2: 3 Promotors (Bottom Row) */}
+            <div className="grid grid-cols-3 gap-3 sm:gap-6 justify-items-center pt-2">
+              {promotors.map((person) => (
+                <div key={person.name} className="flex flex-col items-center text-center max-w-[140px]">
+                  <div className="relative rounded-full p-[3.5px] bg-gradient-to-tr from-cyan-400 via-emerald-400 to-amber-400 shadow-lg">
+                    <img src={person.image} alt={person.name} className="h-24 w-24 sm:h-28 sm:w-28 rounded-full object-cover bg-card" crossOrigin="anonymous" />
+                  </div>
+                  <p className="mt-2 text-[11px] font-bold leading-tight text-slate-900 max-w-[130px] text-center">{person.name}</p>
+                  <p className="mt-1 text-[10px] text-muted-foreground">{person.role}</p>
+                </div>
+              ))}
+            </div>
+          </motion.div></div></section>
       <section className="flex items-center justify-center px-6 py-12 sm:px-12 lg:py-16"><div className="w-full max-w-xl"><p className="mb-8 text-center text-xs font-semibold uppercase tracking-[0.3em] text-muted-foreground">Pilih peran anda</p><div className="grid grid-cols-2 gap-x-5 gap-y-9 sm:gap-x-10">{roles.map((role, index) => <motion.button key={role.key} type="button" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: index * 0.1 }} onClick={() => setSelectedRole(role)} className="group flex flex-col items-center gap-3 rounded-3xl p-2 text-center outline-none focus-visible:ring-2 focus-visible:ring-primary"><motion.span animate={{ y: [0, -9, 0] }} transition={{ duration: 3 + index * 0.4, repeat: Infinity, delay: index * 0.25 }} className="relative block h-32 w-32 rounded-full p-[3px] shadow-lg transition-transform group-hover:scale-105 sm:h-40 sm:w-40" style={{ background: `linear-gradient(135deg, ${role.from}, ${role.to})`, boxShadow: `0 10px 30px ${role.from}44` }}><img src={role.image} alt="" className="h-full w-full rounded-full bg-card object-cover ring-4 ring-card/70" crossOrigin="anonymous" /></motion.span><span className="text-base font-bold text-foreground">{role.title}</span><span className="max-w-44 text-xs leading-relaxed text-muted-foreground">{role.desc}</span></motion.button>)}</div></div></section>
     </div>
     <button type="button" aria-label="Login Admin" title="Login Admin" onClick={() => setAdminOpen(true)} className="fixed bottom-5 right-5 z-20 flex h-11 w-11 items-center justify-center rounded-full bg-slate-800/85 text-slate-50 shadow-lg backdrop-blur transition hover:scale-105 hover:bg-slate-900 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring"><LockKeyhole className="h-5 w-5" /></button>
