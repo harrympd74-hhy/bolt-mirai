@@ -1,0 +1,22 @@
+[
+  {
+    "nis": "MIRAI-0001",
+    "nisn": "0012345678",
+    "full_name": "Alya Putri Ramadhani",
+    "class_name": "VII A",
+    "gender": "Perempuan",
+    "guardian_email": "wali.alya@example.com",
+    "guardian_phone": "080000000001",
+    "status": "Aktif"
+  },
+  {
+    "nis": "MIRAI-0002",
+    "nisn": "0012345679",
+    "full_name": "Bima Aditya Pratama",
+    "class_name": "VII A",
+    "gender": "Laki-laki",
+    "guardian_email": "wali.bima@example.com",
+    "guardian_phone": "080000000002",
+    "status": "Aktif"
+  }
+]

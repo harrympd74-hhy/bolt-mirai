@@ -1,0 +1,20 @@
+[
+  {
+    "kode_guru": "GR-0001",
+    "jenis_guru": "tetap",
+    "nama_lengkap": "Rina Kartikasari, S.Pd.",
+    "nip": "198501012010012001",
+    "mata_pelajaran": "Matematika",
+    "email": "rina.kartikasari@example.com",
+    "status_sertifikasi": "Sudah Sertifikasi"
+  },
+  {
+    "kode_guru": "GR-0002",
+    "jenis_guru": "honor",
+    "nama_lengkap": "Dedi Firmansyah, S.Kom.",
+    "nip": null,
+    "mata_pelajaran": "Informatika",
+    "email": "dedi.firmansyah@example.com",
+    "status_sertifikasi": "Belum Sertifikasi"
+  }
+]
