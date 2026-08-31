@@ -1,59 +1,74 @@
-# Rencana: Revisi Sidebar Menu Dasbor Guru (Accordion + Gaya Baru)
+# Rencana: Admin — Data Siswa + Akun Siswa/Orang Tua
 
 ## Context
-Pengguna ingin mengganti sidebar menu dasbor guru dengan struktur baru untuk Smart Digital Learning Ecosystem:
-- **Accordion** — submenu hanya terbuka saat menu utama diklik (Beranda tanpa submenu; 6 menu lain punya submenu; Profil Guru termasuk submenu "Keluar").
-- **Gaya**: modern, clean, **Sapphire Blue–Metallic Gold–Slate Gray–Turquoise**, card-based, dominasi **Navy Blue**.
-- Struktur menu utama sederhana (7 menu).
+Pengguna ingin menu **Data Siswa** pada Dasbor Admin dibangun mengikuti dua referensi gambar:
+1. Daftar siswa dengan pencarian, jumlah siswa, tombol sembunyikan password, input data, tabel horizontal, status, edit, dan hapus.
+2. Form Input Data Siswa dengan identitas siswa, kelas, jenis kelamin, kontak wali, akun login siswa, dan akun login orang tua.
 
-Mengganti struktur lama (`src/components/guru/navConfig.ts` dengan 30+ item flat + section) yang dipakai oleh `Sidebar`, `MobileDrawer`, `MobileBottomNav`, `Topbar`, dan `GuruDashboard`.
+Data akan dipakai lintas dasbor sehingga tidak lagi menggunakan `siswaStore.ts` in-memory. Password mengikuti keputusan pengguna: **masked di tabel dan tidak disimpan sebagai plaintext; tersedia fitur reset**.
 
-## Struktur menu baru
-| id | label | submenu (id — label) |
-|---|---|---|
-| beranda | Beranda | — |
-| kelas | Kelas Saya | daftar-kelas — Daftar Kelas; buat-kelas — Buat Kelas Baru; jadwal-kelas — Jadwal Kelas; arsip-kelas — Arsip Kelas |
-| siswa | Siswa | semua-siswa — Semua Siswa; progress-capaian — Progress & Capaian; kelompok-belajar — Kelompok Belajar; productive-struggle — Productive Struggle; tutor-sebaya — Tutor Sebaya |
-| pembelajaran | Pembelajaran | rencana-pembelajaran — Rencana Pembelajaran; asesmen — Asesmen (Awal & Akhir); materi-konten — Materi & Konten; ai-tutor — AI Tutor MIRAI; refleksi-siswa — Refleksi Siswa; aktivitas-kolaboratif — Aktivitas Kolaboratif |
-| laporan | Laporan | laporan-kelas — Laporan Kelas; learning-analytics — Learning Analytics; dampak-pembelajaran — Dampak Pembelajaran; partisipasi-kehadiran — Partisipasi & Kehadiran; ekspor-data — Ekspor Data |
-| pengaturan | Pengaturan | preferensi-tampilan — Preferensi Tampilan; notifikasi — Notifikasi; integrasi-lms — Integrasi LMS; privasi-data — Privasi & Data |
-| profil-guru | Profil Guru | edit-profil — Edit Profil; keamanan-akun — Keamanan Akun; bantuan-panduan — Bantuan & Panduan; keluar — Keluar |
+## Keputusan keamanan
+- Data siswa disimpan di Enter Cloud Database.
+- Password tidak disimpan di tabel siswa dan tidak pernah dikirim ke client dalam plaintext.
+- Akun siswa/orang tua dikelola melalui authentication backend; admin hanya menerima username/status dan aksi reset password.
+- Akses admin tidak boleh ditentukan di client. Karena login admin saat ini masih hardcoded/demo di `Index.tsx`, implementasi production perlu memindahkan autentikasi admin ke backend sebelum CRUD dibuka penuh.
+- Setiap tabel baru dibuat melalui migration dengan RLS dan policy yang membatasi admin.
 
-## Pendekatan
-1. **`navConfig.ts`**: ganti tipe `NavItem` menjadi `{id,label,icon,children?}` (tanpa `section`); ekspor `navItems`, `breadcrumbMap` (parent + child), dan `mobileBottomItems` (beranda, kelas, siswa, pembelajaran, laporan).
-2. **`Sidebar.tsx`**: render accordion — state `openMenus` lokal; klik menu ber-submenu toggles; klik submenu → `onNavigate(child.id)`; parent aktif jika dirinya atau child-nya aktif; mode collapsed: klik parent → expand sidebar + buka accordion; tooltip tetap.
-3. **`MobileDrawer.tsx`**: accordion serupa (submenu di-indent), klik submenu → `onNavigate`.
-4. **`GuruDashboard.tsx`**: `navigate(id)` — jika id menu utama (punya children) → arahkan ke child pertama; jika `id==="keluar"` → `window.location.assign("/")`; konten: `beranda` → Beranda, `edit-profil` → ProfilGuru, lainnya → PlaceholderPage (dengan ikon parent/child yang benar); judul breadcrumb di-resolve dari `breadcrumbMap`.
-5. **`Topbar.tsx`**: tombol profil → `onNavigate("edit-profil")` (label breadcrumb otomatis benar karena `breadcrumbMap` berisi child).
-6. **`Beranda.tsx`**: remap `onNavigate`: `jadwal-mengajar`→`jadwal-kelas`, `detail-kelas`→`daftar-kelas`, quickActions `tugas`→`rencana-pembelajaran`, `presensi`→`partisipasi-kehadiran`, `modul-ajar`→`rencana-pembelajaran`, `sumber-materi`→`materi-konten`.
-7. **`index.css`**: perbarui `.guru-sidebar` ke gradient **Navy** (bukan teal); gaya aktif **Metallic Gold + Slate Gray** (`.guru-nav-item-active` dengan inset gold + latar slate, `.guru-nav-child-active` berwarna gold); tambah token `--guru-gold: 45 80% 55%` dan `--guru-slate: 215 20% 42%`.
+## Tahap implementasi yang direkomendasikan
+### 1. Backend & schema
+- Buat tabel `student_profiles`: `id`, `nis`, `nisn`, `full_name`, `class_name`, `gender`, `guardian_email`, `guardian_phone`, `status`, `created_at`, `updated_at`.
+- Buat tabel `student_accounts`: `student_id`, `account_type` (`student`/`parent`), `username`, `auth_user_id`, `last_password_reset_at`, `created_at`, `updated_at`.
+- Tambahkan unique index untuk NIS/NISN dan kombinasi tipe akun/username.
+- Aktifkan RLS pada kedua tabel di migration yang sama. Policy membaca/menulis hanya untuk role admin yang sudah terautentikasi; siswa/orang tua hanya membaca profil yang terhubung dengan akun masing-masing.
+- Buat backend function `admin-student-accounts` untuk membuat akun auth, membuat/reset password, dan mengembalikan hanya status akun (bukan password).
+- Buat/upgrade alur autentikasi admin agar policy dapat mengenali role admin; jangan menggunakan password hardcoded dari `Index.tsx` untuk akses production.
+- Jalankan pemeriksaan schema/RLS setelah migration.
 
-## File yang diubah
-- `src/components/guru/navConfig.ts` (tulis ulang struktur)
-- `src/components/guru/Sidebar.tsx` (accordion)
-- `src/components/guru/MobileDrawer.tsx` (accordion)
-- `src/components/guru/MobileBottomNav.tsx` (pakai item baru — tidak berubah kode, hanya data)
-- `src/pages/GuruDashboard.tsx` (navigate + content switch + resolve title)
-- `src/components/guru/Topbar.tsx` (profil → edit-profil)
-- `src/pages/guru/Beranda.tsx` (remap id navigasi)
-- `src/index.css` (gaya sidebar navy + gold/slate)
+### 2. UI daftar siswa
+- Rework `src/components/admin/DataSiswaList.tsx` mengikuti gambar: header `Daftar Siswa`, jumlah siswa, tombol `Sembunyikan Sandi`, tombol `Input Data Siswa`, search nama/NIS/kelas, tabel overflow horizontal.
+- Kolom: NIS, Nama, Kelas, L/P, Kontak, User Siswa, Sandi Siswa (masked), User Ortu, Sandi Ortu (masked), Status, Aksi.
+- Sandi selalu berupa bullet/masked; tombol reset membuka konfirmasi dan memanggil backend function.
+- Tambahkan state loading, empty state, error state, dan refresh setelah create/edit/delete/reset.
+- Pertahankan pola ikon lucide dan token warna admin yang sudah ada.
+
+### 3. UI form input siswa
+- Rework `src/components/admin/InputSiswa.tsx` mengikuti gambar: tombol kembali, identitas siswa, kelas, jenis kelamin, email wali, nomor telepon wali, panel akun login siswa, panel akun login orang tua, tombol Simpan/Batal.
+- Validasi field wajib: NIS, nama lengkap, kelas, username/password awal siswa, username/password awal orang tua.
+- Password hanya dikirim sekali ke backend function saat pembuatan akun dan tidak dikembalikan ke browser setelah tersimpan.
+- Setelah berhasil, kembali ke daftar siswa dan menampilkan notifikasi sukses.
+
+### 4. Integrasi admin dashboard
+- Ganti `src/data/siswaStore.ts` sebagai sumber data daftar admin dengan query backend; store demo tidak lagi dipakai untuk route admin.
+- Pertahankan `AdminDashboard.tsx` menu `Daftar Siswa` dan `Input Siswa`, hanya ubah callback/state agar refresh berbasis data server.
+- Pastikan pencarian, edit, hapus, reset password, dan create menggunakan backend/database.
+
+## File penting
+- `src/components/admin/DataSiswaList.tsx`
+- `src/components/admin/InputSiswa.tsx`
+- `src/pages/AdminDashboard.tsx`
+- `src/data/siswaStore.ts` (deprecate untuk admin setelah query backend aktif)
+- `src/pages/Index.tsx` (alur login admin perlu dinaikkan ke authentication backend)
+- Migration Enter Cloud melalui `supabase_migration` (bukan edit file SQL manual)
+- `supabase/functions/admin-student-accounts/index.ts`
 
 ## Implementation checklist
-- [ ] `navConfig.ts`: tipe `NavItem` baru dengan `children?`, 7 menu + submenu sesuai tabel, `breadcrumbMap` mencakup child, `mobileBottomItems` baru.
-- [ ] `index.css`: `.guru-sidebar` gradient navy; `.guru-nav-item-active` (inset metallic gold + latar slate) dan `.guru-nav-child-active` (teks gold); token `--guru-gold`, `--guru-slate`.
-- [ ] `Sidebar.tsx`: accordion (`openMenus`), chevron kanan/bawah, klik parent toggles, klik child `onNavigate(child)`, highlight parent aktif bila ada child aktif, mode collapsed tetap aman (klik parent → expand + buka).
-- [ ] `MobileDrawer.tsx`: accordion dengan submenu indent, klik child `onNavigate(child)`.
-- [ ] `GuruDashboard.tsx`: `navigate` menangani parent→child pertama, `keluar`→logout, konten `beranda`→Beranda, `edit-profil`→ProfilGuru, lainnya→PlaceholderPage, judul dari `breadcrumbMap`.
-- [ ] `Topbar.tsx`: tombol profil → `onNavigate("edit-profil")`.
-- [ ] `Beranda.tsx`: semua `onNavigate` lama di-remap ke id baru.
-- [ ] Tidak ada id menu lama yang tersisa di referensi navigasi (grep `jadwal-mengajar|detail-kelas|beban-kerja|kelas-aktif|pilih-mode|bank-soal|jurnal-harian` → 0 selain navConfig lama yang sudah diganti).
+- [ ] Konfirmasi/terapkan model password masked + reset tanpa plaintext.
+- [ ] Buat migration `student_profiles` + `student_accounts` dengan unique constraints, foreign key, RLS, dan policy role-aware.
+- [ ] Buat backend function akun siswa/orang tua untuk create/reset/status; tidak mengembalikan password.
+- [ ] Hubungkan authentication admin ke role admin sebelum policy CRUD production digunakan.
+- [ ] Verifikasi schema dan RLS dengan pemeriksaan metadata Enter Cloud.
+- [ ] Rework `DataSiswaList.tsx` sesuai referensi dengan kolom akun masked, search, status, aksi edit/hapus/reset.
+- [ ] Rework `InputSiswa.tsx` sesuai referensi dengan dua panel akun login.
+- [ ] Hubungkan daftar/form ke query backend dan refresh setelah mutation.
+- [ ] Pertahankan fallback empty/error/loading yang jelas tanpa memalsukan data server.
 
 ## Verification checklist
-- [ ] `/guru` tampil: sidebar navy, 7 menu utama sederhana, Beranda aktif.
-- [ ] Klik "Kelas Saya" → submenu (Daftar Kelas, Buat Kelas Baru, Jadwal Kelas, Arsip Kelas) terbuka; klik lagi → tertutup. Hanya satu accordion yang terbuka sesuai klik (tidak semua terbuka bersamaan).
-- [ ] Klik submenu (mis. "Jadwal Kelas") → konten placeholder sesuai judul; parent "Kelas Saya" tetap ter-highlight.
-- [ ] Submenu "Keluar" pada Profil Guru → kembali ke halaman `/` (logout).
-- [ ] Tombol "Profil" di topbar → halaman ProfilGuru terbuka (submenu Profil Guru terbuka otomatis).
-- [ ] Beranda: akses cepat & kartu kelas mengarah ke halaman baru yang benar (placeholder).
-- [ ] Mode collapsed: klik menu ber-submenu → sidebar melebar + accordion terbuka.
-- [ ] `pnpm run build` berhasil tanpa error TypeScript/lint.
+- [ ] Admin dapat membuka Daftar Siswa dan melihat data dari database, bukan array in-memory.
+- [ ] Search berdasarkan nama, NIS, atau kelas menghasilkan data yang sesuai.
+- [ ] Input siswa baru membuat profil + dua akun; password tidak muncul kembali sebagai plaintext.
+- [ ] Tombol sembunyikan sandi selalu menjaga password masked; reset password hanya melalui konfirmasi/backend.
+- [ ] Edit dan hapus memperbarui database serta daftar tanpa refresh halaman.
+- [ ] Pengguna non-admin tidak dapat membaca atau menulis seluruh data siswa melalui policy.
+- [ ] Empty state dan error state tampil ketika data kosong atau request gagal.
+- [ ] Desktop mengikuti komposisi referensi; tabel tetap bisa di-scroll horizontal pada lebar sempit.
+- [ ] `pnpm run check` dan `pnpm run build` berhasil.
