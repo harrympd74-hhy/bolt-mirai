@@ -1,56 +1,54 @@
-# Rencana: Perbaikan Login dan Manajemen Admin MIRAI
+# Rencana: Modul Jadwal Terhubung Guru dan Siswa
 
 ## Context
-Login admin MIRAI sudah memanggil autentikasi email/password dengan format `username@mirai.local`, tetapi akses admin penuh belum lengkap. Pengguna meminta akun admin khusus `hasanhadid` dengan password yang dipilih, serta dasbor yang dapat mengelola seluruh pengguna: reset password, menonaktifkan, menghapus, dan mengubah peran. Password Auth tetap disimpan sebagai hash oleh sistem dan tidak pernah ditampilkan kembali.
+Dasbor admin MIRAI saat ini memiliki menu jadwal tetapi masih berupa placeholder. Dasbor guru dan siswa juga menampilkan konten jadwal demo lokal. Pengguna meminta admin dapat membangun jadwal yang terhubung dengan guru dan siswa, sehingga satu jadwal berdasarkan kelas dapat terlihat oleh guru terkait dan seluruh siswa pada kelas tersebut.
 
 ## Pendekatan
-1. Pertahankan login pada `src/components/AdminLoginModal.tsx`, tetapi tambahkan state sesi global/guard agar halaman `/admin` dan operasi admin tidak hanya bergantung pada navigasi client.
-2. Buat satu backend function `admin-user-management` dengan verifikasi JWT server-side dan `app_metadata.role === "admin"`. Function memakai client service-role hanya di server untuk:
-   - daftar pengguna tanpa password/hash/token;
-   - reset password;
-   - aktif/nonaktif akun;
-   - hapus akun dengan konfirmasi eksplisit;
-   - ubah role yang diizinkan.
-3. Tambahkan audit log untuk operasi sensitif dan RLS admin-only pada tabel audit. Tidak ada privilege check yang dipercaya dari client.
-4. Ganti/selaraskan panel `src/components/admin/AdminCredentialVault.tsx` menjadi panel manajemen pengguna Auth. Password tidak dapat dipulihkan atau dilihat; form hanya menerima password baru untuk reset dan memakai ikon mata lokal saat mengetik.
-5. Tambahkan menu dan UI aksi di `src/pages/AdminDashboard.tsx` dengan status loading/error, konfirmasi sebelum hapus/nonaktifkan, dan perlindungan agar admin terakhir tidak dapat dihapus atau diturunkan perannya.
-6. Provision akun awal `hasanhadid@mirai.local` di lingkungan admin tepercaya dengan `app_metadata: { role: "admin" }`; password tidak ditanam di repository, migration, JSON, atau frontend. Jika akun belum ada, langkah provisioning aman harus dijalankan menggunakan jalur Auth admin yang memiliki service-role key.
+1. Buat tabel `class_schedules` di backend dengan RLS aktif: kelas, mata pelajaran, guru, hari, jam mulai/selesai, ruang, semester, status, dan timestamps. Jadwal mengacu ke `teacher_profiles` bila guru tersedia; kelas menjadi penghubung ke `student_profiles.class_name`.
+2. Buat backend function `schedule-management` untuk operasi admin CRUD dan pembacaan jadwal terfilter:
+   - admin dapat membuat, mengedit, menghapus, dan mempublikasikan jadwal;
+   - guru hanya menerima jadwal yang terkait akun/profil gurunya;
+   - siswa hanya menerima jadwal berdasarkan `class_name` profil/akun siswa;
+   - semua role diverifikasi di backend, bukan dari pilihan role client.
+3. Tambahkan validasi bentrok: guru tidak boleh memiliki dua jadwal beririsan pada hari/jam yang sama, dan kelas tidak boleh memiliki dua mata pelajaran beririsan. Pesan konflik harus dikembalikan sebelum mutation.
+4. Buat komponen admin `ScheduleManagement` dengan tampilan mingguan, filter kelas/guru, form jadwal, pilihan guru dari data profil yang ada, dan aksi edit/hapus/publikasi. Menu placeholder jadwal admin diarahkan ke komponen ini.
+5. Tambahkan komponen jadwal reusable untuk dasbor guru dan siswa. Guru melihat jadwal mengajarnya; siswa melihat jadwal kelasnya. Pertahankan fallback demo hanya saat sesi autentikasi belum tersedia, dengan label jelas bahwa data tersebut demo.
+6. Jangan memasukkan password, token, atau data sensitif ke JSON GitHub; data jadwal operasional disimpan di backend.
 
 ## File yang dibuat/diubah
-- `src/components/AdminLoginModal.tsx`: validasi login dan pesan error.
-- `src/pages/AdminDashboard.tsx`: guard sesi admin dan menu manajemen pengguna.
-- `src/components/admin/AdminUserManagement.tsx`: daftar pengguna dan aksi reset/nonaktif/hapus/ubah role.
-- `supabase/functions/admin-user-management/index.ts`: operasi Auth server-side dan audit.
-- Migration melalui `supabase_migration`: tabel `admin_user_audit_logs`, RLS, index, dan policy admin-only.
-- `supabase/config.toml`: hanya bila diperlukan konfigurasi backend function.
-- File generated `src/integrations/supabase/client.ts` dan `types.ts` tidak diedit manual.
+- Migration melalui `supabase_migration`: tabel `class_schedules`, foreign key/index, RLS/policy.
+- `supabase/functions/schedule-management/index.ts`: CRUD admin, query role-based, validasi konflik.
+- `src/components/admin/ScheduleManagement.tsx`: kalender/list mingguan dan form admin.
+- `src/components/shared/ScheduleList.tsx`: daftar jadwal reusable.
+- `src/pages/AdminDashboard.tsx`: sambungkan menu jadwal dan subhalaman input/daftar.
+- `src/pages/GuruDashboard.tsx` dan/atau `src/pages/guru/Beranda.tsx`: jadwal guru dari backend.
+- `src/pages/SiswaDashboard.tsx`: jadwal siswa dari backend.
+- `src/integrations/supabase/types.ts`: hanya regenerated otomatis oleh migrasi, tidak diedit manual.
 
 ## Batasan keamanan
-- Password Auth tidak bisa dibaca kembali; hanya dapat direset.
-- Service-role key tidak pernah dikirim ke browser, chat, GitHub, atau file `.env` frontend.
-- Semua endpoint manajemen memverifikasi sesi dan role admin di backend.
-- User biasa, user anonim, dan admin tanpa role tidak dapat membaca daftar Auth atau menjalankan aksi.
-- Penghapusan dan perubahan role admin memakai konfirmasi dan aturan perlindungan admin terakhir.
+- RLS aktif di migration yang membuat tabel.
+- Admin check dan ownership/class filtering dilakukan backend/RLS.
+- Siswa tidak dapat melihat jadwal kelas lain; guru tidak dapat mengubah jadwal dari dasbornya.
+- Demo login tidak mendapatkan akses operasi backend; jadwal admin dan data nyata memerlukan sesi Auth admin.
 
 ## Implementation checklist
-- [ ] Tambahkan migration audit log dengan RLS aktif pada migration yang membuat tabel dan policy admin-only.
-- [ ] Implementasikan backend function `admin-user-management` tanpa raw SQL dan tanpa mengembalikan password/hash/token.
-- [ ] Implementasikan aksi list, reset-password, toggle-disabled, delete, dan set-role dengan validasi input.
-- [ ] Tambahkan guard sesi yang memuat session dan user melalui `onAuthStateChange` sebelum pemeriksaan sesi awal.
-- [ ] Buat panel admin dengan tabel pengguna, filter, indikator status, form reset password, dan konfirmasi aksi destruktif.
-- [ ] Hubungkan panel ke backend function melalui `supabase.functions.invoke`.
-- [ ] Provision user awal `hasanhadid@mirai.local` melalui jalur Auth admin tepercaya dengan role admin; jangan simpan password di source.
-- [ ] Pastikan menu vault lama tidak memberikan kesan password Auth dapat dilihat kembali.
+- [ ] Buat migration `class_schedules` dengan RLS, foreign key guru, dan index kelas/hari/waktu.
+- [ ] Verifikasi schema dan policy RLS setelah migration.
+- [ ] Implementasikan backend function `schedule-management` dengan aksi list, create, update, delete, publish.
+- [ ] Tambahkan validasi input tanggal/jam/semester dan bentrok guru/kelas sebelum insert/update.
+- [ ] Buat UI admin jadwal dengan form pilihan guru, kelas, mata pelajaran, hari, jam, ruang, semester, dan status.
+- [ ] Hubungkan menu `jadwalPembelajaran` dan `inputJadwal` di `AdminDashboard`.
+- [ ] Buat `ScheduleList` reusable dan hubungkan query jadwal ke GuruDashboard serta SiswaDashboard.
+- [ ] Sediakan state loading, error, kosong, dan fallback demo yang diberi label.
 - [ ] Jalankan `pnpm run check` dan `pnpm run build`.
 
 ## Verification checklist
-- [ ] Login valid dengan username `hasanhadid` diarahkan ke `/admin` hanya bila email Auth dan `app_metadata.role` benar.
-- [ ] Password salah, email tidak terdaftar, dan role non-admin ditolak tanpa membocorkan detail akun.
-- [ ] Admin dapat melihat daftar user tanpa kolom password/hash/token.
-- [ ] Admin dapat mereset password dan password baru dapat dipakai login.
-- [ ] Admin dapat menonaktifkan/mengaktifkan user dan user nonaktif ditolak saat login.
-- [ ] Admin dapat menghapus user dan user terhapus tidak dapat login.
-- [ ] Admin dapat mengubah role, tetapi admin terakhir tidak dapat dihapus atau diturunkan.
-- [ ] Non-admin mendapat status 403 dari backend function dan tidak dapat membaca audit log.
-- [ ] Audit log merekam actor, aksi, target, dan waktu tanpa menyimpan password.
+- [ ] Admin dapat membuat jadwal valid dan jadwal muncul pada daftar mingguan.
+- [ ] Admin dapat mengedit, mempublikasikan, dan menghapus jadwal.
+- [ ] Bentrok jadwal guru ditolak dengan pesan yang menyebut jadwal bentrok.
+- [ ] Bentrok kelas ditolak dengan pesan yang menyebut kelas dan waktu.
+- [ ] Guru hanya melihat jadwal yang terhubung ke akun/profilnya.
+- [ ] Siswa hanya melihat jadwal berdasarkan kelasnya.
+- [ ] Pengguna non-admin tidak dapat menjalankan CRUD admin dan menerima 403.
+- [ ] Jadwal tidak dipindahkan ke GitHub JSON dan tidak memuat password/token.
 - [ ] `pnpm run check` dan `pnpm run build` berhasil.
