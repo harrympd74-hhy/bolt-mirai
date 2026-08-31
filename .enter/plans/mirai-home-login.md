@@ -1,59 +1,56 @@
-# Rencana: Sinkronisasi Manual GitHub → Enter Cloud
+# Rencana: Perbaikan Login dan Manajemen Admin MIRAI
 
 ## Context
-GitHub `harrympd74-hhy/bolt-mirai` menjadi sumber utama data. Pengguna memilih format hybrid: data mentah disimpan dalam JSON terpisah di repository, kemudian divalidasi dengan Zod sebelum masuk Enter Cloud. Sinkronisasi dilakukan manual dari tombol Admin terlebih dahulu.
-
-Repository saat ini berisi source code dan schema, sehingga konektor tidak akan menebak semua file TypeScript sebagai data. Konektor memakai kontrak file JSON eksplisit:
-- `data/students.json`
-- `data/teachers.json`
-- `data/classes.json`
-- `data/schedules.json`
+Login admin MIRAI sudah memanggil autentikasi email/password dengan format `username@mirai.local`, tetapi akses admin penuh belum lengkap. Pengguna meminta akun admin khusus `hasanhadid` dengan password yang dipilih, serta dasbor yang dapat mengelola seluruh pengguna: reset password, menonaktifkan, menghapus, dan mengubah peran. Password Auth tetap disimpan sebagai hash oleh sistem dan tidak pernah ditampilkan kembali.
 
 ## Pendekatan
-1. Tambahkan schema Zod di backend function untuk memvalidasi bentuk data sebelum mutation.
-2. Buat tabel `sync_runs` untuk log status, commit SHA, jumlah record, error, dan waktu sinkronisasi; aktifkan RLS.
-3. Buat backend function `github-sync`:
-   - hanya bisa dipanggil admin terautentikasi;
-   - membaca branch `main` melalui GitHub Contents API;
-   - memakai `GITHUB_TOKEN` jika repository private, tanpa menaruh token di client;
-   - mengambil file JSON yang disepakati;
-   - memvalidasi setiap dataset dengan Zod;
-   - melakukan upsert ke `student_profiles`, `teacher_profiles`, dan tabel data tambahan yang tersedia;
-   - menulis log `sync_runs` dan mengembalikan ringkasan.
-4. Tambahkan tombol **Sinkronkan dari GitHub** di Dasbor Admin, area status sinkronisasi terakhir, jumlah record, commit, loading, error, dan hasil berhasil.
-5. Tambahkan contoh kontrak JSON di repository MIRAI agar pengguna bisa menyalin format yang benar; data sensitif/password tidak boleh masuk JSON GitHub.
-
-## Batasan keamanan
-- Password akun, API key, token, dan file `.env` dilarang berada di GitHub JSON.
-- RLS membatasi log sinkronisasi hanya admin.
-- Kontrol admin dilakukan di backend berdasarkan role authentication, bukan hanya tombol client.
-- Sinkronisasi manual dulu; jadwal harian belum diaktifkan sampai alur manual tervalidasi.
+1. Pertahankan login pada `src/components/AdminLoginModal.tsx`, tetapi tambahkan state sesi global/guard agar halaman `/admin` dan operasi admin tidak hanya bergantung pada navigasi client.
+2. Buat satu backend function `admin-user-management` dengan verifikasi JWT server-side dan `app_metadata.role === "admin"`. Function memakai client service-role hanya di server untuk:
+   - daftar pengguna tanpa password/hash/token;
+   - reset password;
+   - aktif/nonaktif akun;
+   - hapus akun dengan konfirmasi eksplisit;
+   - ubah role yang diizinkan.
+3. Tambahkan audit log untuk operasi sensitif dan RLS admin-only pada tabel audit. Tidak ada privilege check yang dipercaya dari client.
+4. Ganti/selaraskan panel `src/components/admin/AdminCredentialVault.tsx` menjadi panel manajemen pengguna Auth. Password tidak dapat dipulihkan atau dilihat; form hanya menerima password baru untuk reset dan memakai ikon mata lokal saat mengetik.
+5. Tambahkan menu dan UI aksi di `src/pages/AdminDashboard.tsx` dengan status loading/error, konfirmasi sebelum hapus/nonaktifkan, dan perlindungan agar admin terakhir tidak dapat dihapus atau diturunkan perannya.
+6. Provision akun awal `hasanhadid@mirai.local` di lingkungan admin tepercaya dengan `app_metadata: { role: "admin" }`; password tidak ditanam di repository, migration, JSON, atau frontend. Jika akun belum ada, langkah provisioning aman harus dijalankan menggunakan jalur Auth admin yang memiliki service-role key.
 
 ## File yang dibuat/diubah
-- Migration Enter Cloud melalui `supabase_migration`: tabel `sync_runs` + RLS.
-- `supabase/functions/github-sync/index.ts`: fetch GitHub, Zod validation, upsert, log.
-- `src/components/admin/GitHubSync.tsx`: tombol dan status sync.
-- `src/pages/AdminDashboard.tsx`: tambahkan panel/akses sinkronisasi tanpa mengubah menu yang ada.
-- Kontrak JSON `data/*.json` di repository bila pengguna menyetujui seed template.
-- `supabase/config.toml` hanya jika konfigurasi function diperlukan.
+- `src/components/AdminLoginModal.tsx`: validasi login dan pesan error.
+- `src/pages/AdminDashboard.tsx`: guard sesi admin dan menu manajemen pengguna.
+- `src/components/admin/AdminUserManagement.tsx`: daftar pengguna dan aksi reset/nonaktif/hapus/ubah role.
+- `supabase/functions/admin-user-management/index.ts`: operasi Auth server-side dan audit.
+- Migration melalui `supabase_migration`: tabel `admin_user_audit_logs`, RLS, index, dan policy admin-only.
+- `supabase/config.toml`: hanya bila diperlukan konfigurasi backend function.
+- File generated `src/integrations/supabase/client.ts` dan `types.ts` tidak diedit manual.
+
+## Batasan keamanan
+- Password Auth tidak bisa dibaca kembali; hanya dapat direset.
+- Service-role key tidak pernah dikirim ke browser, chat, GitHub, atau file `.env` frontend.
+- Semua endpoint manajemen memverifikasi sesi dan role admin di backend.
+- User biasa, user anonim, dan admin tanpa role tidak dapat membaca daftar Auth atau menjalankan aksi.
+- Penghapusan dan perubahan role admin memakai konfirmasi dan aturan perlindungan admin terakhir.
 
 ## Implementation checklist
-- [ ] Buat migration tabel `sync_runs` dengan RLS dan policy admin.
-- [ ] Verifikasi schema/RLS setelah migration.
-- [ ] Implementasikan backend function `github-sync` dengan fetch GitHub, branch `main`, validasi Zod, upsert, dan logging.
-- [ ] Pastikan `GITHUB_TOKEN` dibaca dari secret backend jika repository private.
-- [ ] Deploy dan verifikasi backend function.
-- [ ] Buat komponen Admin `GitHubSync` dengan tombol manual, status, commit, jumlah record, loading, dan error.
-- [ ] Integrasikan komponen ke Dasbor Admin.
-- [ ] Tambahkan kontrak JSON tanpa password/token/data sensitif.
-- [ ] Uji dataset valid, dataset invalid, file hilang, dan repository gagal diakses.
+- [ ] Tambahkan migration audit log dengan RLS aktif pada migration yang membuat tabel dan policy admin-only.
+- [ ] Implementasikan backend function `admin-user-management` tanpa raw SQL dan tanpa mengembalikan password/hash/token.
+- [ ] Implementasikan aksi list, reset-password, toggle-disabled, delete, dan set-role dengan validasi input.
+- [ ] Tambahkan guard sesi yang memuat session dan user melalui `onAuthStateChange` sebelum pemeriksaan sesi awal.
+- [ ] Buat panel admin dengan tabel pengguna, filter, indikator status, form reset password, dan konfirmasi aksi destruktif.
+- [ ] Hubungkan panel ke backend function melalui `supabase.functions.invoke`.
+- [ ] Provision user awal `hasanhadid@mirai.local` melalui jalur Auth admin tepercaya dengan role admin; jangan simpan password di source.
+- [ ] Pastikan menu vault lama tidak memberikan kesan password Auth dapat dilihat kembali.
+- [ ] Jalankan `pnpm run check` dan `pnpm run build`.
 
 ## Verification checklist
-- [ ] Admin dapat menekan Sinkronkan dari GitHub dan melihat hasil ringkasan.
-- [ ] Commit SHA yang diproses tercatat di `sync_runs`.
-- [ ] Data valid masuk/upsert ke tabel target tanpa duplikasi.
-- [ ] JSON invalid ditolak sebelum mutation dan error tercatat.
-- [ ] File yang tidak tersedia menghasilkan status gagal yang jelas.
-- [ ] Non-admin tidak dapat menjalankan atau membaca log sinkronisasi.
-- [ ] Tidak ada secret/password dalam response, client code, atau JSON contoh.
+- [ ] Login valid dengan username `hasanhadid` diarahkan ke `/admin` hanya bila email Auth dan `app_metadata.role` benar.
+- [ ] Password salah, email tidak terdaftar, dan role non-admin ditolak tanpa membocorkan detail akun.
+- [ ] Admin dapat melihat daftar user tanpa kolom password/hash/token.
+- [ ] Admin dapat mereset password dan password baru dapat dipakai login.
+- [ ] Admin dapat menonaktifkan/mengaktifkan user dan user nonaktif ditolak saat login.
+- [ ] Admin dapat menghapus user dan user terhapus tidak dapat login.
+- [ ] Admin dapat mengubah role, tetapi admin terakhir tidak dapat dihapus atau diturunkan.
+- [ ] Non-admin mendapat status 403 dari backend function dan tidak dapat membaca audit log.
+- [ ] Audit log merekam actor, aksi, target, dan waktu tanpa menyimpan password.
 - [ ] `pnpm run check` dan `pnpm run build` berhasil.
