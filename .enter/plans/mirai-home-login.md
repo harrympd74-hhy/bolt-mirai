@@ -1,61 +1,40 @@
-# Rencana: Pertemuan Kelas dan Persiapan Kelas Guru
+# Rencana: Revisi Ruang Pertemuan dan Ruang Kelas Siswa
 
 ## Context
-Pengguna meminta fitur baru pada submenu **Rencana Pembelajaran** di dasbor guru, dengan tampilan kartu Pertemuan Kelas seperti referensi: kartu horizontal/scrollable, status berwarna, ringkasan bahan ajar dan tugas, serta aksi Siapkan/Lihat Detail. Pertemuan yang disiapkan guru harus muncul di Ruang Kelas siswa bersama bahan ajar, tugas, file, dan link pembelajaran.
+Dasbor siswa saat ini masih mencampur menu Ruang Pertemuan dengan alur Ruang Kelas aktif. Pengguna meminta Ruang Pertemuan hanya menampilkan daftar kartu pertemuan seperti referensi, sedangkan Ruang Kelas hanya menampilkan pertemuan yang sedang aktif berdasarkan pertemuan yang dibuat/dipublikasikan guru.
 
 ## Pendekatan
-1. Tambahkan submenu **Pertemuan Kelas** di bawah **Rencana Pembelajaran** pada konfigurasi navigasi guru.
-2. Buat tabel backend `class_meetings`, `meeting_materials`, dan `meeting_assignments` dengan RLS aktif. Pertemuan mengacu ke `teacher_profiles`, kelas, dan jadwal; materials/assignments mengacu ke meeting. Data siswa akan membaca hanya meeting yang dipublikasikan untuk kelasnya.
-3. Buat backend function `class-meetings` untuk list/create/update/delete meeting, publish/unpublish, serta create/update/delete materials dan assignments. Semua mutasi diverifikasi sebagai guru pemilik meeting atau admin; pembacaan siswa dibatasi kelas dan status published.
-4. Buat UI `ClassMeetingsPage` bergaya clean-professional sesuai referensi: header, tombol `+ Tambah Pertemuan`, kartu grid horizontal responsif, border/shadow status, ikon kalender/jam, jumlah bahan/tugas, legenda, dan status baru **Belum Aktif**.
-5. Terapkan logika status dinamis:
-   - `Belum Aktif` jika waktu KBM masih lebih dari 4 hari dan/atau lebih dari 2 jam sesuai aturan yang disepakati;
-   - `Akan datang` saat sudah mendekati waktu KBM;
-   - `Selesai`/`Sebagian Selesai` dari status tugas;
-   - `Terkunci` untuk meeting yang tidak dapat diedit.
-6. Buat `ClassMeetingPreparation` untuk menambah/edit bahan ajar dan tugas. Upload menggunakan storage Enter Cloud melalui skill storage, dengan validasi ekstensi `.doc`, `.docx`, `.pdf`, `.ppt`, `.pptx`, `.flash`, `.flipbook`, `.mp4`; link Google Drive/YouTube dan URL umum disimpan sebagai link.
-7. Tambahkan tampilan konten meeting terbit di ruang siswa yang membaca meeting published beserta material, assignment, file URL, dan learning links.
+1. Buat komponen `StudentMeetingCards` yang mengambil data meeting published dari backend `class-meetings` dan menampilkan kartu dua kolom responsif seperti referensi: nomor besar, judul, tanggal/waktu, status, jumlah bahan, dan jumlah tugas.
+2. Pisahkan status siswa menjadi `Selesai`, `Belum Aktif`, dan `Sedang Berlangsung/Akan datang` berdasarkan waktu meeting serta status publikasi. Kartu hanya menjadi daftar informasi dan pintu masuk, tanpa editor atau form guru.
+3. Ubah menu **Ruang Pertemuan** agar membuka halaman kartu tersebut saja.
+4. Buat komponen `ActiveStudentClassroom` yang memfilter meeting published berdasarkan kelas siswa dan hanya menampilkan meeting aktif pada waktu sekarang. Jika tidak ada meeting aktif, tampilkan empty state dengan jadwal pertemuan berikutnya dan tombol kembali.
+5. Ubah menu **Ruang Kelas** agar membuka `ActiveStudentClassroom`, bukan langsung memakai materi demo. Saat kartu meeting aktif dipilih dari Ruang Pertemuan, buka ruang pembelajaran yang sama dengan konteks meeting tersebut.
+6. Pertahankan fallback demo hanya untuk preview tanpa sesi backend; beri label Demo dan jangan mencampurnya dengan data meeting nyata.
 
 ## File yang dibuat/diubah
-- `src/components/guru/navConfig.ts`: submenu `Pertemuan Kelas` di bawah `Rencana Pembelajaran`.
-- `src/pages/guru/ClassMeetingsPage.tsx`: daftar kartu dan status.
-- `src/pages/guru/ClassMeetingPreparation.tsx`: editor bahan ajar/tugas/upload/link.
-- `src/components/shared/ClassMeetingCard.tsx`: kartu reusable guru.
-- `src/components/shared/StudentMeetingContent.tsx`: konten meeting untuk ruang siswa.
-- `src/pages/GuruDashboard.tsx`: routing submenu baru dan halaman persiapan.
-- `src/pages/SiswaDashboard.tsx` serta `src/pages/siswa/RuangKelasAktif.tsx`: tampilkan meeting/material/assignment terbit.
-- Migration melalui `supabase_migration`: tiga tabel, foreign key, index, timestamps, dan RLS.
-- `supabase/functions/class-meetings/index.ts`: CRUD dan filtering role/ownership/class.
-- Storage Enter Cloud melalui skill resource upload untuk file bahan ajar.
-- Generated `src/integrations/supabase/types.ts` hanya diregenerasi otomatis, tidak diedit manual.
-
-## Batasan keamanan
-- Password, token, dan secret tidak disimpan dalam materials atau assignment.
-- Guru hanya dapat mengedit meeting yang dimilikinya; siswa hanya membaca meeting published di kelasnya.
-- RLS aktif pada semua tabel baru pada migration yang sama.
-- Validasi tipe file dan ukuran dilakukan sebelum upload; link eksternal tidak dipercaya untuk menjalankan script.
+- `src/components/shared/StudentMeetingCards.tsx`: daftar kartu Ruang Pertemuan sesuai referensi.
+- `src/components/shared/ActiveStudentClassroom.tsx`: filter dan tampilan ruang kelas aktif.
+- `src/pages/SiswaDashboard.tsx`: routing terpisah Ruang Pertemuan vs Ruang Kelas.
+- `src/pages/siswa/RuangKelasAktif.tsx`: menerima konteks meeting aktif bila dipilih.
+- `src/components/shared/StudentMeetingContent.tsx`: tetap dipakai untuk bahan/tugas meeting aktif.
 
 ## Implementation checklist
-- [ ] Tambahkan submenu `Pertemuan Kelas` pada `navConfig.ts` di bawah `Rencana Pembelajaran`.
-- [ ] Buat migration tiga tabel dengan RLS, FK, index, dan policy guru/siswa/admin yang tepat.
-- [ ] Verifikasi schema dan policy RLS setelah migration.
-- [ ] Implementasikan dan deploy backend function `class-meetings` untuk CRUD, publish, materials, assignments, dan role filtering.
-- [ ] Buat kartu meeting dengan status warna, ringkasan, aksi, dan legenda sesuai referensi.
-- [ ] Buat form tambah/edit pertemuan dengan jadwal, kelas, materi, dan status terkunci.
-- [ ] Buat halaman Persiapan Kelas untuk bahan ajar, tugas, upload file valid, dan link pembelajaran.
-- [ ] Hubungkan upload storage tanpa menaruh file privat atau token di client response yang tidak perlu.
-- [ ] Tampilkan meeting terbit beserta materials/assignments pada ruang siswa.
+- [ ] Buat `StudentMeetingCards` dengan layout kartu dua kolom dan status visual sesuai referensi.
+- [ ] Hubungkan kartu ke `class-meetings` dengan mode baca siswa dan filter published.
+- [ ] Pisahkan klik menu `Ruang Pertemuan` ke daftar kartu, tanpa membuka ruang aktif otomatis.
+- [ ] Buat `ActiveStudentClassroom` yang hanya merender meeting aktif berdasarkan waktu sekarang.
+- [ ] Hubungkan menu `Ruang Kelas` ke `ActiveStudentClassroom`.
+- [ ] Tambahkan empty state jika belum ada meeting aktif dan tampilkan meeting terdekat bila tersedia.
+- [ ] Pastikan bahan ajar dan tugas hanya muncul di ruang kelas ketika meeting aktif.
+- [ ] Pertahankan demo fallback dengan label yang jelas.
 - [ ] Jalankan `pnpm run check` dan `pnpm run build`.
 
 ## Verification checklist
-- [ ] Submenu `Pertemuan Kelas` tampil di bawah `Rencana Pembelajaran` dan membuka halaman baru.
-- [ ] Kartu menampilkan nomor, judul, tanggal/waktu, status, jumlah bahan, jumlah tugas, dan aksi yang benar.
-- [ ] Status `Belum Aktif` berubah menjadi `Akan datang` mengikuti aturan waktu.
-- [ ] Guru dapat menambah/edit meeting dan menyiapkan bahan/tugas.
-- [ ] File ekstensi yang diizinkan diterima; ekstensi lain ditolak dengan pesan jelas.
-- [ ] Link pembelajaran tersimpan dan tampil sebagai link aman.
-- [ ] Guru lain tidak dapat mengedit meeting milik guru berbeda.
-- [ ] Siswa hanya melihat meeting published untuk kelasnya.
-- [ ] Bahan ajar, tugas, file, dan link tampil di Ruang Kelas siswa setelah diterbitkan.
-- [ ] Status terkunci menonaktifkan aksi Siapkan.
+- [ ] Klik Ruang Pertemuan hanya menampilkan kartu-kartu seperti desain referensi.
+- [ ] Kartu menampilkan nomor, judul, tanggal/waktu, status, jumlah bahan, dan jumlah tugas.
+- [ ] Kartu meeting yang belum waktunya tidak muncul sebagai ruang kelas aktif.
+- [ ] Klik Ruang Kelas menampilkan hanya meeting guru yang sedang berlangsung untuk kelas siswa.
+- [ ] Jika tidak ada meeting aktif, muncul empty state yang informatif.
+- [ ] Bahan ajar dan tugas meeting aktif tampil di Ruang Kelas siswa.
+- [ ] Non-published meeting tidak dapat terlihat oleh siswa melalui backend maupun UI.
 - [ ] `pnpm run check` dan `pnpm run build` berhasil.
