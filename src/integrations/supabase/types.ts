@@ -3360,6 +3360,45 @@ export type Database = {
   }
   public: {
     Tables: {
+      admin_credentials: {
+        Row: {
+          account_type: string
+          created_at: string
+          display_name: string
+          encrypted_password: string
+          id: string
+          iv: string
+          metadata: Json
+          subject_key: string
+          updated_at: string
+          username: string
+        }
+        Insert: {
+          account_type: string
+          created_at?: string
+          display_name: string
+          encrypted_password: string
+          id?: string
+          iv: string
+          metadata?: Json
+          subject_key: string
+          updated_at?: string
+          username: string
+        }
+        Update: {
+          account_type?: string
+          created_at?: string
+          display_name?: string
+          encrypted_password?: string
+          id?: string
+          iv?: string
+          metadata?: Json
+          subject_key?: string
+          updated_at?: string
+          username?: string
+        }
+        Relationships: []
+      }
       student_accounts: {
         Row: {
           account_type: string
