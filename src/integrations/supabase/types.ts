@@ -3429,6 +3429,61 @@ export type Database = {
         }
         Relationships: []
       }
+      class_meetings: {
+        Row: {
+          class_name: string
+          created_at: string
+          ends_at: string
+          id: string
+          meeting_number: number
+          schedule_id: string | null
+          starts_at: string
+          status: string
+          teacher_id: string
+          title: string
+          updated_at: string
+        }
+        Insert: {
+          class_name: string
+          created_at?: string
+          ends_at: string
+          id?: string
+          meeting_number: number
+          schedule_id?: string | null
+          starts_at: string
+          status?: string
+          teacher_id: string
+          title: string
+          updated_at?: string
+        }
+        Update: {
+          class_name?: string
+          created_at?: string
+          ends_at?: string
+          id?: string
+          meeting_number?: number
+          schedule_id?: string | null
+          starts_at?: string
+          status?: string
+          teacher_id?: string
+          title?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "class_meetings_schedule_id_fkey"
+            columns: ["schedule_id"]
+            referencedRelation: "class_schedules"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "class_meetings_teacher_id_fkey"
+            columns: ["teacher_id"]
+            referencedRelation: "teacher_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       class_schedules: {
         Row: {
           class_name: string
@@ -3477,6 +3532,83 @@ export type Database = {
             foreignKeyName: "class_schedules_teacher_id_fkey"
             columns: ["teacher_id"]
             referencedRelation: "teacher_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      meeting_assignments: {
+        Row: {
+          created_at: string
+          description: string | null
+          due_at: string | null
+          id: string
+          meeting_id: string
+          status: string
+          title: string
+        }
+        Insert: {
+          created_at?: string
+          description?: string | null
+          due_at?: string | null
+          id?: string
+          meeting_id: string
+          status?: string
+          title: string
+        }
+        Update: {
+          created_at?: string
+          description?: string | null
+          due_at?: string | null
+          id?: string
+          meeting_id?: string
+          status?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "meeting_assignments_meeting_id_fkey"
+            columns: ["meeting_id"]
+            referencedRelation: "class_meetings"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      meeting_materials: {
+        Row: {
+          created_at: string
+          external_url: string | null
+          file_name: string | null
+          file_url: string | null
+          id: string
+          kind: string
+          meeting_id: string
+          title: string
+        }
+        Insert: {
+          created_at?: string
+          external_url?: string | null
+          file_name?: string | null
+          file_url?: string | null
+          id?: string
+          kind: string
+          meeting_id: string
+          title: string
+        }
+        Update: {
+          created_at?: string
+          external_url?: string | null
+          file_name?: string | null
+          file_url?: string | null
+          id?: string
+          kind?: string
+          meeting_id?: string
+          title?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "meeting_materials_meeting_id_fkey"
+            columns: ["meeting_id"]
+            referencedRelation: "class_meetings"
             referencedColumns: ["id"]
           },
         ]
