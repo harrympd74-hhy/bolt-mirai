@@ -4,6 +4,7 @@ import { assignments, groups, lessons, siswaProfile } from "@/data/siswaDashboar
 import AITutorSession from "./siswa/AITutorSession";
 import RuangKelasAktif from "./siswa/RuangKelasAktif";
 import RuangBelajar from "./siswa/RuangBelajar";
+import ScheduleList from "@/components/shared/ScheduleList";
 
 const menuItems = [
   { label: "Jadwal Pelajaran", Icon: Calendar, expandable: true },
@@ -26,7 +27,7 @@ function Navigation({ active, open, onClose, onSelect }: { active: string; open:
 
 function StudentHome({ onClass }: { onClass: (topic: "Sudut" | "Garis-Garis Sejajar") => void }) {
   return (
-    <div className="mx-auto max-w-6xl space-y-6 p-4 sm:p-6 lg:p-8">
+    <div className="mx-auto max-w-6xl space-y-6 p-4 sm:p-6 lg:p-8"><ScheduleList title="Jadwal Pelajaran" compact />
       <section className="rounded-3xl bg-gradient-to-br from-[hsl(var(--guru-sapphire))] via-[hsl(var(--guru-turquoise))] to-[hsl(var(--guru-yellow-soft))] p-6 text-primary-foreground shadow-lg sm:p-8"><p className="text-sm text-primary-foreground/75">SMP Kelas 7 · Matematika</p><h1 className="mt-1 text-3xl font-black">Halo, Ahmad</h1><p className="mt-2 text-sm text-primary-foreground/75">Lanjutkan belajar sudut dan garis-garis sejajar.</p></section>
       <div className="grid grid-cols-3 gap-3"><div className="rounded-2xl border border-border bg-card p-4"><Flame className="mb-3 text-[hsl(var(--guru-yellow))]" size={20} /><b className="text-xl">{siswaProfile.streak}</b><p className="text-xs text-muted-foreground">Streak Belajar</p></div><div className="rounded-2xl border border-border bg-card p-4"><Zap className="mb-3 text-[hsl(var(--guru-sapphire))]" size={20} /><b className="text-xl">{siswaProfile.dayaJuang}%</b><p className="text-xs text-muted-foreground">Daya Juang</p></div><div className="rounded-2xl border border-border bg-card p-4"><Star className="mb-3 text-[hsl(var(--guru-turquoise))]" size={20} /><b className="text-xl">{siswaProfile.totalPoints}</b><p className="text-xs text-muted-foreground">Total Poin</p></div></div>
       <div className="grid gap-5 lg:grid-cols-2"><section className="rounded-2xl border border-border bg-card"><h2 className="flex items-center gap-2 border-b border-border p-5 text-sm font-bold"><Calendar size={16} /> Jadwal Hari Ini · Kelas 7</h2>{lessons.map((lesson) => <div key={lesson.time} className="flex gap-3 border-b border-border p-4 last:border-0"><div className="h-9 w-1 rounded-full bg-[hsl(var(--guru-turquoise))]" /><div><p className="text-sm font-semibold">{lesson.subject}</p><p className="text-xs text-muted-foreground">{lesson.time} · {lesson.room}</p></div></div>)}</section><section className="rounded-2xl border border-border bg-card"><h2 className="flex items-center gap-2 border-b border-border p-5 text-sm font-bold"><CheckCircle2 size={16} /> Meja Kerja</h2>{assignments.map((task) => <div key={task.title} className="flex gap-3 border-b border-border p-4 last:border-0"><CheckCircle2 size={16} className={task.done ? "text-[hsl(var(--guru-turquoise))]" : "text-muted-foreground"} /><div><p className="text-sm font-medium">{task.title}</p><p className="text-xs text-muted-foreground">{task.subject} · {task.due}</p></div></div>)}</section></div>

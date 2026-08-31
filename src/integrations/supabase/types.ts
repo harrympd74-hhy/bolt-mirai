@@ -3429,6 +3429,58 @@ export type Database = {
         }
         Relationships: []
       }
+      class_schedules: {
+        Row: {
+          class_name: string
+          created_at: string
+          day_of_week: number
+          end_time: string
+          id: string
+          room: string | null
+          semester: string
+          start_time: string
+          status: string
+          subject: string
+          teacher_id: string | null
+          updated_at: string
+        }
+        Insert: {
+          class_name: string
+          created_at?: string
+          day_of_week: number
+          end_time: string
+          id?: string
+          room?: string | null
+          semester?: string
+          start_time: string
+          status?: string
+          subject: string
+          teacher_id?: string | null
+          updated_at?: string
+        }
+        Update: {
+          class_name?: string
+          created_at?: string
+          day_of_week?: number
+          end_time?: string
+          id?: string
+          room?: string | null
+          semester?: string
+          start_time?: string
+          status?: string
+          subject?: string
+          teacher_id?: string | null
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "class_schedules_teacher_id_fkey"
+            columns: ["teacher_id"]
+            referencedRelation: "teacher_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       student_accounts: {
         Row: {
           account_type: string
