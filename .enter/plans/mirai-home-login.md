@@ -1,74 +1,70 @@
-# Rencana: Admin — Data Siswa + Akun Siswa/Orang Tua
+# Rencana: Admin — Input Guru + Akun Login
 
 ## Context
-Pengguna ingin menu **Data Siswa** pada Dasbor Admin dibangun mengikuti dua referensi gambar:
-1. Daftar siswa dengan pencarian, jumlah siswa, tombol sembunyikan password, input data, tabel horizontal, status, edit, dan hapus.
-2. Form Input Data Siswa dengan identitas siswa, kelas, jenis kelamin, kontak wali, akun login siswa, dan akun login orang tua.
+Pengguna ingin form **Input Guru** Dasbor Admin mengikuti referensi: pilihan jenis kepegawaian **Guru Tetap, Guru Honor, Guru Magang**, data pribadi/kepegawaian, serta pembuatan username dan password oleh admin. Fitur akun berlaku sama untuk ketiga jenis guru.
 
-Data akan dipakai lintas dasbor sehingga tidak lagi menggunakan `siswaStore.ts` in-memory. Password mengikuti keputusan pengguna: **masked di tabel dan tidak disimpan sebagai plaintext; tersedia fitur reset**.
+Password mengikuti aturan keamanan yang sudah disepakati untuk siswa: **masked setelah dibuat, tidak disimpan plaintext, dan tersedia reset password**.
 
-## Keputusan keamanan
-- Data siswa disimpan di Enter Cloud Database.
-- Password tidak disimpan di tabel siswa dan tidak pernah dikirim ke client dalam plaintext.
-- Akun siswa/orang tua dikelola melalui authentication backend; admin hanya menerima username/status dan aksi reset password.
-- Akses admin tidak boleh ditentukan di client. Karena login admin saat ini masih hardcoded/demo di `Index.tsx`, implementasi production perlu memindahkan autentikasi admin ke backend sebelum CRUD dibuka penuh.
-- Setiap tabel baru dibuat melalui migration dengan RLS dan policy yang membatasi admin.
+## Pendekatan
+- Pertahankan `GuruRecord` dan struktur jenis guru yang sudah ada.
+- Tambahkan akun guru sebagai relasi backend terpisah, bukan kolom password pada profil guru.
+- Gunakan pola `student_accounts` yang sudah dibuat: `teacher_accounts` menyimpan username, tipe akun, auth user id, dan timestamp reset terakhir; password dikelola authentication backend.
+- UI input mengikuti referensi dengan panel `Akun Login Guru` di bawah data kepegawaian.
+- Daftar Guru Tetap/Honor/Magang menampilkan username dan status password masked, plus aksi reset.
+- Admin authentication backend menjadi prasyarat untuk mutation production; login admin saat ini masih demo/hardcoded sehingga tidak boleh dijadikan kontrol akses database.
 
-## Tahap implementasi yang direkomendasikan
-### 1. Backend & schema
-- Buat tabel `student_profiles`: `id`, `nis`, `nisn`, `full_name`, `class_name`, `gender`, `guardian_email`, `guardian_phone`, `status`, `created_at`, `updated_at`.
-- Buat tabel `student_accounts`: `student_id`, `account_type` (`student`/`parent`), `username`, `auth_user_id`, `last_password_reset_at`, `created_at`, `updated_at`.
-- Tambahkan unique index untuk NIS/NISN dan kombinasi tipe akun/username.
-- Aktifkan RLS pada kedua tabel di migration yang sama. Policy membaca/menulis hanya untuk role admin yang sudah terautentikasi; siswa/orang tua hanya membaca profil yang terhubung dengan akun masing-masing.
-- Buat backend function `admin-student-accounts` untuk membuat akun auth, membuat/reset password, dan mengembalikan hanya status akun (bukan password).
-- Buat/upgrade alur autentikasi admin agar policy dapat mengenali role admin; jangan menggunakan password hardcoded dari `Index.tsx` untuk akses production.
-- Jalankan pemeriksaan schema/RLS setelah migration.
+## Backend & Database
+1. Migration Enter Cloud:
+   - Tambah `teacher_accounts` dengan `teacher_id`, `account_type = 'teacher'`, `username` unique, `auth_user_id`, `last_password_reset_at`, timestamps.
+   - Foreign key ke profil guru yang persisten. Karena profil guru saat ini masih in-memory, tambahkan tabel `teacher_profiles` yang memuat `kode_guru`, `jenis_guru`, field data pribadi/kepegawaian utama, status, timestamps.
+   - Unique constraint `kode_guru`, serta index jenis/nama.
+   - Aktifkan RLS pada kedua tabel dalam migration yang sama.
+   - Policy admin untuk CRUD berdasarkan `auth.jwt() -> app_metadata ->> 'role' = 'admin'`; policy guru untuk membaca profil/akun yang terhubung dengan `auth.uid()`.
+2. Backend function `admin-teacher-accounts`:
+   - action `create`: membuat auth user guru dan relasi account, mengembalikan username/status/kode saja.
+   - action `reset-password`: mereset password tanpa mengembalikan plaintext.
+   - action `delete`: menghapus relasi/profil sesuai aturan.
+   - Validasi role admin di backend, bukan client.
+3. Verifikasi schema dan RLS setelah migration.
 
-### 2. UI daftar siswa
-- Rework `src/components/admin/DataSiswaList.tsx` mengikuti gambar: header `Daftar Siswa`, jumlah siswa, tombol `Sembunyikan Sandi`, tombol `Input Data Siswa`, search nama/NIS/kelas, tabel overflow horizontal.
-- Kolom: NIS, Nama, Kelas, L/P, Kontak, User Siswa, Sandi Siswa (masked), User Ortu, Sandi Ortu (masked), Status, Aksi.
-- Sandi selalu berupa bullet/masked; tombol reset membuka konfirmasi dan memanggil backend function.
-- Tambahkan state loading, empty state, error state, dan refresh setelah create/edit/delete/reset.
-- Pertahankan pola ikon lucide dan token warna admin yang sudah ada.
-
-### 3. UI form input siswa
-- Rework `src/components/admin/InputSiswa.tsx` mengikuti gambar: tombol kembali, identitas siswa, kelas, jenis kelamin, email wali, nomor telepon wali, panel akun login siswa, panel akun login orang tua, tombol Simpan/Batal.
-- Validasi field wajib: NIS, nama lengkap, kelas, username/password awal siswa, username/password awal orang tua.
-- Password hanya dikirim sekali ke backend function saat pembuatan akun dan tidak dikembalikan ke browser setelah tersimpan.
-- Setelah berhasil, kembali ke daftar siswa dan menampilkan notifikasi sukses.
-
-### 4. Integrasi admin dashboard
-- Ganti `src/data/siswaStore.ts` sebagai sumber data daftar admin dengan query backend; store demo tidak lagi dipakai untuk route admin.
-- Pertahankan `AdminDashboard.tsx` menu `Daftar Siswa` dan `Input Siswa`, hanya ubah callback/state agar refresh berbasis data server.
-- Pastikan pencarian, edit, hapus, reset password, dan create menggunakan backend/database.
+## UI
+- `src/components/admin/InputGuru.tsx`:
+  - Pertahankan tiga tab jenis kepegawaian dan seluruh field referensi.
+  - Tambahkan panel `Akun Login Guru`: username, password awal, konfirmasi password, indikator password, dan catatan bahwa password selanjutnya masked.
+  - Validasi nama, jenis guru, username, password, konfirmasi password.
+  - Simpan profil + akun melalui backend; tampilkan halaman berhasil dengan username dan tombol reset/lihat daftar.
+- `src/components/admin/DataGuruList.tsx`:
+  - Tambahkan kolom username guru dan status password masked.
+  - Tambahkan aksi reset password dengan dialog konfirmasi.
+  - Tetap pisahkan filter Guru Tetap/Honor/Magang.
+- `src/data/guruStore.ts`:
+  - Tambahkan field akun non-sensitif untuk kompatibilitas UI sementara, lalu arahkan sumber data admin ke query backend setelah auth admin tersedia.
+- `src/pages/AdminDashboard.tsx`:
+  - Pertahankan navigasi Input Guru untuk ketiga jenis; pastikan callback kembali ke daftar jenis yang benar.
 
 ## File penting
-- `src/components/admin/DataSiswaList.tsx`
-- `src/components/admin/InputSiswa.tsx`
+- `src/components/admin/InputGuru.tsx`
+- `src/components/admin/DataGuruList.tsx`
+- `src/data/guruStore.ts`
 - `src/pages/AdminDashboard.tsx`
-- `src/data/siswaStore.ts` (deprecate untuk admin setelah query backend aktif)
-- `src/pages/Index.tsx` (alur login admin perlu dinaikkan ke authentication backend)
-- Migration Enter Cloud melalui `supabase_migration` (bukan edit file SQL manual)
-- `supabase/functions/admin-student-accounts/index.ts`
+- Migration Enter Cloud melalui `supabase_migration`
+- `supabase/functions/admin-teacher-accounts/index.ts`
 
 ## Implementation checklist
-- [ ] Konfirmasi/terapkan model password masked + reset tanpa plaintext.
-- [ ] Buat migration `student_profiles` + `student_accounts` dengan unique constraints, foreign key, RLS, dan policy role-aware.
-- [ ] Buat backend function akun siswa/orang tua untuk create/reset/status; tidak mengembalikan password.
-- [ ] Hubungkan authentication admin ke role admin sebelum policy CRUD production digunakan.
-- [ ] Verifikasi schema dan RLS dengan pemeriksaan metadata Enter Cloud.
-- [ ] Rework `DataSiswaList.tsx` sesuai referensi dengan kolom akun masked, search, status, aksi edit/hapus/reset.
-- [ ] Rework `InputSiswa.tsx` sesuai referensi dengan dua panel akun login.
-- [ ] Hubungkan daftar/form ke query backend dan refresh setelah mutation.
-- [ ] Pertahankan fallback empty/error/loading yang jelas tanpa memalsukan data server.
+- [ ] Buat `teacher_profiles` dan `teacher_accounts` dengan foreign key, unique constraint, index, RLS, dan policy role-aware.
+- [ ] Buat backend function create/reset/delete akun guru tanpa mengembalikan password.
+- [ ] Verifikasi schema dan daftar RLS policy Enter Cloud.
+- [ ] Tambahkan panel akun guru pada form Input Guru sesuai referensi.
+- [ ] Terapkan validasi password dan konfirmasi password tanpa menyimpan plaintext.
+- [ ] Tambahkan username/status masked dan aksi reset pada daftar guru Tetap/Honor/Magang.
+- [ ] Hubungkan callback Input Guru dan daftar guru untuk ketiga jenis.
+- [ ] Pastikan admin authentication backend menjadi kontrol akses sebelum CRUD production.
 
 ## Verification checklist
-- [ ] Admin dapat membuka Daftar Siswa dan melihat data dari database, bukan array in-memory.
-- [ ] Search berdasarkan nama, NIS, atau kelas menghasilkan data yang sesuai.
-- [ ] Input siswa baru membuat profil + dua akun; password tidak muncul kembali sebagai plaintext.
-- [ ] Tombol sembunyikan sandi selalu menjaga password masked; reset password hanya melalui konfirmasi/backend.
-- [ ] Edit dan hapus memperbarui database serta daftar tanpa refresh halaman.
-- [ ] Pengguna non-admin tidak dapat membaca atau menulis seluruh data siswa melalui policy.
-- [ ] Empty state dan error state tampil ketika data kosong atau request gagal.
-- [ ] Desktop mengikuti komposisi referensi; tabel tetap bisa di-scroll horizontal pada lebar sempit.
+- [ ] Form dapat berpindah antara Guru Tetap, Honor, dan Magang tanpa kehilangan struktur data.
+- [ ] Field data pribadi/kepegawaian dan panel akun guru tampil sesuai referensi.
+- [ ] Password tidak pernah tampil plaintext setelah penyimpanan; reset membutuhkan konfirmasi.
+- [ ] Username unik dan akun tertaut ke profil guru yang benar.
+- [ ] Daftar masing-masing jenis guru menampilkan username dan status masked.
+- [ ] Pengguna non-admin tidak dapat CRUD data guru melalui RLS/backend function.
 - [ ] `pnpm run check` dan `pnpm run build` berhasil.
