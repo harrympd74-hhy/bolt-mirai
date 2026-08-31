@@ -1,1 +1,4 @@
 project_id = "spb-t4n20imhy7o435fp"
+
+[functions.ai-tutor]
+verify_jwt = false
