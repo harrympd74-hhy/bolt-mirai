@@ -3442,6 +3442,145 @@ export type Database = {
         }
         Relationships: []
       }
+      teacher_accounts: {
+        Row: {
+          account_type: string
+          auth_user_id: string | null
+          created_at: string
+          id: string
+          last_password_reset_at: string | null
+          teacher_id: string
+          updated_at: string
+          username: string
+        }
+        Insert: {
+          account_type?: string
+          auth_user_id?: string | null
+          created_at?: string
+          id?: string
+          last_password_reset_at?: string | null
+          teacher_id: string
+          updated_at?: string
+          username: string
+        }
+        Update: {
+          account_type?: string
+          auth_user_id?: string | null
+          created_at?: string
+          id?: string
+          last_password_reset_at?: string | null
+          teacher_id?: string
+          updated_at?: string
+          username?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "teacher_accounts_teacher_id_fkey"
+            columns: ["teacher_id"]
+            referencedRelation: "teacher_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      teacher_profiles: {
+        Row: {
+          agama: string | null
+          alamat: string | null
+          beban_mengajar: string | null
+          created_at: string
+          email: string | null
+          golongan: string | null
+          id: string
+          jabatan: string | null
+          jenis_guru: string
+          jenis_kelamin: string | null
+          jurusan: string | null
+          kelas_ampu: string | null
+          kode_guru: string
+          kota: string | null
+          mata_pelajaran: string | null
+          nama_lengkap: string
+          nik: string | null
+          nip: string | null
+          nuptk: string | null
+          pendidikan_terakhir: string | null
+          provinsi: string | null
+          status_pernikahan: string | null
+          status_sertifikasi: string | null
+          tanggal_lahir: string | null
+          telepon: string | null
+          tempat_lahir: string | null
+          tmt: string | null
+          unit_kerja: string | null
+          universitas: string | null
+          updated_at: string
+        }
+        Insert: {
+          agama?: string | null
+          alamat?: string | null
+          beban_mengajar?: string | null
+          created_at?: string
+          email?: string | null
+          golongan?: string | null
+          id?: string
+          jabatan?: string | null
+          jenis_guru: string
+          jenis_kelamin?: string | null
+          jurusan?: string | null
+          kelas_ampu?: string | null
+          kode_guru: string
+          kota?: string | null
+          mata_pelajaran?: string | null
+          nama_lengkap: string
+          nik?: string | null
+          nip?: string | null
+          nuptk?: string | null
+          pendidikan_terakhir?: string | null
+          provinsi?: string | null
+          status_pernikahan?: string | null
+          status_sertifikasi?: string | null
+          tanggal_lahir?: string | null
+          telepon?: string | null
+          tempat_lahir?: string | null
+          tmt?: string | null
+          unit_kerja?: string | null
+          universitas?: string | null
+          updated_at?: string
+        }
+        Update: {
+          agama?: string | null
+          alamat?: string | null
+          beban_mengajar?: string | null
+          created_at?: string
+          email?: string | null
+          golongan?: string | null
+          id?: string
+          jabatan?: string | null
+          jenis_guru?: string
+          jenis_kelamin?: string | null
+          jurusan?: string | null
+          kelas_ampu?: string | null
+          kode_guru?: string
+          kota?: string | null
+          mata_pelajaran?: string | null
+          nama_lengkap?: string
+          nik?: string | null
+          nip?: string | null
+          nuptk?: string | null
+          pendidikan_terakhir?: string | null
+          provinsi?: string | null
+          status_pernikahan?: string | null
+          status_sertifikasi?: string | null
+          tanggal_lahir?: string | null
+          telepon?: string | null
+          tempat_lahir?: string | null
+          tmt?: string | null
+          unit_kerja?: string | null
+          universitas?: string | null
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

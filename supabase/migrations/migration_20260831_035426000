@@ -1,0 +1,58 @@
+create table if not exists public.teacher_profiles (
+  id uuid primary key default gen_random_uuid(),
+  kode_guru text not null unique,
+  jenis_guru text not null,
+  nama_lengkap text not null,
+  nip text,
+  nik text,
+  nuptk text,
+  tempat_lahir text,
+  tanggal_lahir date,
+  jenis_kelamin text,
+  agama text,
+  status_pernikahan text,
+  telepon text,
+  email text,
+  alamat text,
+  kota text,
+  provinsi text,
+  golongan text,
+  tmt date,
+  unit_kerja text,
+  jabatan text,
+  mata_pelajaran text,
+  kelas_ampu text,
+  beban_mengajar text,
+  pendidikan_terakhir text,
+  jurusan text,
+  universitas text,
+  status_sertifikasi text default 'Belum Sertifikasi',
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  constraint teacher_profiles_jenis_check check (jenis_guru in ('tetap', 'honor', 'magang'))
+);
+
+create table if not exists public.teacher_accounts (
+  id uuid primary key default gen_random_uuid(),
+  teacher_id uuid not null references public.teacher_profiles(id) on delete cascade,
+  account_type text not null default 'teacher',
+  username text not null unique,
+  auth_user_id uuid,
+  last_password_reset_at timestamptz,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  constraint teacher_accounts_type_check check (account_type = 'teacher'),
+  constraint teacher_accounts_teacher_unique unique (teacher_id)
+);
+
+alter table public.teacher_profiles enable row level security;
+alter table public.teacher_accounts enable row level security;
+
+create policy "admins manage teacher profiles" on public.teacher_profiles for all to authenticated using ((auth.jwt() -> 'app_metadata' ->> 'role') = 'admin') with check ((auth.jwt() -> 'app_metadata' ->> 'role') = 'admin');
+create policy "teachers read own profile" on public.teacher_profiles for select to authenticated using (exists (select 1 from public.teacher_accounts a where a.teacher_id = teacher_profiles.id and a.auth_user_id = auth.uid()));
+create policy "admins manage teacher accounts" on public.teacher_accounts for all to authenticated using ((auth.jwt() -> 'app_metadata' ->> 'role') = 'admin') with check ((auth.jwt() -> 'app_metadata' ->> 'role') = 'admin');
+create policy "teachers read own account" on public.teacher_accounts for select to authenticated using (auth_user_id = auth.uid());
+
+create index if not exists teacher_profiles_jenis_idx on public.teacher_profiles(jenis_guru);
+create index if not exists teacher_profiles_name_idx on public.teacher_profiles using gin (to_tsvector('simple', nama_lengkap));
+create index if not exists teacher_accounts_teacher_idx on public.teacher_accounts(teacher_id);
