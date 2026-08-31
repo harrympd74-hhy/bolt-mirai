@@ -1,70 +1,59 @@
-# Rencana: Admin — Input Guru + Akun Login
+# Rencana: Sinkronisasi Manual GitHub → Enter Cloud
 
 ## Context
-Pengguna ingin form **Input Guru** Dasbor Admin mengikuti referensi: pilihan jenis kepegawaian **Guru Tetap, Guru Honor, Guru Magang**, data pribadi/kepegawaian, serta pembuatan username dan password oleh admin. Fitur akun berlaku sama untuk ketiga jenis guru.
+GitHub `harrympd74-hhy/bolt-mirai` menjadi sumber utama data. Pengguna memilih format hybrid: data mentah disimpan dalam JSON terpisah di repository, kemudian divalidasi dengan Zod sebelum masuk Enter Cloud. Sinkronisasi dilakukan manual dari tombol Admin terlebih dahulu.
 
-Password mengikuti aturan keamanan yang sudah disepakati untuk siswa: **masked setelah dibuat, tidak disimpan plaintext, dan tersedia reset password**.
+Repository saat ini berisi source code dan schema, sehingga konektor tidak akan menebak semua file TypeScript sebagai data. Konektor memakai kontrak file JSON eksplisit:
+- `data/students.json`
+- `data/teachers.json`
+- `data/classes.json`
+- `data/schedules.json`
 
 ## Pendekatan
-- Pertahankan `GuruRecord` dan struktur jenis guru yang sudah ada.
-- Tambahkan akun guru sebagai relasi backend terpisah, bukan kolom password pada profil guru.
-- Gunakan pola `student_accounts` yang sudah dibuat: `teacher_accounts` menyimpan username, tipe akun, auth user id, dan timestamp reset terakhir; password dikelola authentication backend.
-- UI input mengikuti referensi dengan panel `Akun Login Guru` di bawah data kepegawaian.
-- Daftar Guru Tetap/Honor/Magang menampilkan username dan status password masked, plus aksi reset.
-- Admin authentication backend menjadi prasyarat untuk mutation production; login admin saat ini masih demo/hardcoded sehingga tidak boleh dijadikan kontrol akses database.
+1. Tambahkan schema Zod di backend function untuk memvalidasi bentuk data sebelum mutation.
+2. Buat tabel `sync_runs` untuk log status, commit SHA, jumlah record, error, dan waktu sinkronisasi; aktifkan RLS.
+3. Buat backend function `github-sync`:
+   - hanya bisa dipanggil admin terautentikasi;
+   - membaca branch `main` melalui GitHub Contents API;
+   - memakai `GITHUB_TOKEN` jika repository private, tanpa menaruh token di client;
+   - mengambil file JSON yang disepakati;
+   - memvalidasi setiap dataset dengan Zod;
+   - melakukan upsert ke `student_profiles`, `teacher_profiles`, dan tabel data tambahan yang tersedia;
+   - menulis log `sync_runs` dan mengembalikan ringkasan.
+4. Tambahkan tombol **Sinkronkan dari GitHub** di Dasbor Admin, area status sinkronisasi terakhir, jumlah record, commit, loading, error, dan hasil berhasil.
+5. Tambahkan contoh kontrak JSON di repository MIRAI agar pengguna bisa menyalin format yang benar; data sensitif/password tidak boleh masuk JSON GitHub.
 
-## Backend & Database
-1. Migration Enter Cloud:
-   - Tambah `teacher_accounts` dengan `teacher_id`, `account_type = 'teacher'`, `username` unique, `auth_user_id`, `last_password_reset_at`, timestamps.
-   - Foreign key ke profil guru yang persisten. Karena profil guru saat ini masih in-memory, tambahkan tabel `teacher_profiles` yang memuat `kode_guru`, `jenis_guru`, field data pribadi/kepegawaian utama, status, timestamps.
-   - Unique constraint `kode_guru`, serta index jenis/nama.
-   - Aktifkan RLS pada kedua tabel dalam migration yang sama.
-   - Policy admin untuk CRUD berdasarkan `auth.jwt() -> app_metadata ->> 'role' = 'admin'`; policy guru untuk membaca profil/akun yang terhubung dengan `auth.uid()`.
-2. Backend function `admin-teacher-accounts`:
-   - action `create`: membuat auth user guru dan relasi account, mengembalikan username/status/kode saja.
-   - action `reset-password`: mereset password tanpa mengembalikan plaintext.
-   - action `delete`: menghapus relasi/profil sesuai aturan.
-   - Validasi role admin di backend, bukan client.
-3. Verifikasi schema dan RLS setelah migration.
+## Batasan keamanan
+- Password akun, API key, token, dan file `.env` dilarang berada di GitHub JSON.
+- RLS membatasi log sinkronisasi hanya admin.
+- Kontrol admin dilakukan di backend berdasarkan role authentication, bukan hanya tombol client.
+- Sinkronisasi manual dulu; jadwal harian belum diaktifkan sampai alur manual tervalidasi.
 
-## UI
-- `src/components/admin/InputGuru.tsx`:
-  - Pertahankan tiga tab jenis kepegawaian dan seluruh field referensi.
-  - Tambahkan panel `Akun Login Guru`: username, password awal, konfirmasi password, indikator password, dan catatan bahwa password selanjutnya masked.
-  - Validasi nama, jenis guru, username, password, konfirmasi password.
-  - Simpan profil + akun melalui backend; tampilkan halaman berhasil dengan username dan tombol reset/lihat daftar.
-- `src/components/admin/DataGuruList.tsx`:
-  - Tambahkan kolom username guru dan status password masked.
-  - Tambahkan aksi reset password dengan dialog konfirmasi.
-  - Tetap pisahkan filter Guru Tetap/Honor/Magang.
-- `src/data/guruStore.ts`:
-  - Tambahkan field akun non-sensitif untuk kompatibilitas UI sementara, lalu arahkan sumber data admin ke query backend setelah auth admin tersedia.
-- `src/pages/AdminDashboard.tsx`:
-  - Pertahankan navigasi Input Guru untuk ketiga jenis; pastikan callback kembali ke daftar jenis yang benar.
-
-## File penting
-- `src/components/admin/InputGuru.tsx`
-- `src/components/admin/DataGuruList.tsx`
-- `src/data/guruStore.ts`
-- `src/pages/AdminDashboard.tsx`
-- Migration Enter Cloud melalui `supabase_migration`
-- `supabase/functions/admin-teacher-accounts/index.ts`
+## File yang dibuat/diubah
+- Migration Enter Cloud melalui `supabase_migration`: tabel `sync_runs` + RLS.
+- `supabase/functions/github-sync/index.ts`: fetch GitHub, Zod validation, upsert, log.
+- `src/components/admin/GitHubSync.tsx`: tombol dan status sync.
+- `src/pages/AdminDashboard.tsx`: tambahkan panel/akses sinkronisasi tanpa mengubah menu yang ada.
+- Kontrak JSON `data/*.json` di repository bila pengguna menyetujui seed template.
+- `supabase/config.toml` hanya jika konfigurasi function diperlukan.
 
 ## Implementation checklist
-- [ ] Buat `teacher_profiles` dan `teacher_accounts` dengan foreign key, unique constraint, index, RLS, dan policy role-aware.
-- [ ] Buat backend function create/reset/delete akun guru tanpa mengembalikan password.
-- [ ] Verifikasi schema dan daftar RLS policy Enter Cloud.
-- [ ] Tambahkan panel akun guru pada form Input Guru sesuai referensi.
-- [ ] Terapkan validasi password dan konfirmasi password tanpa menyimpan plaintext.
-- [ ] Tambahkan username/status masked dan aksi reset pada daftar guru Tetap/Honor/Magang.
-- [ ] Hubungkan callback Input Guru dan daftar guru untuk ketiga jenis.
-- [ ] Pastikan admin authentication backend menjadi kontrol akses sebelum CRUD production.
+- [ ] Buat migration tabel `sync_runs` dengan RLS dan policy admin.
+- [ ] Verifikasi schema/RLS setelah migration.
+- [ ] Implementasikan backend function `github-sync` dengan fetch GitHub, branch `main`, validasi Zod, upsert, dan logging.
+- [ ] Pastikan `GITHUB_TOKEN` dibaca dari secret backend jika repository private.
+- [ ] Deploy dan verifikasi backend function.
+- [ ] Buat komponen Admin `GitHubSync` dengan tombol manual, status, commit, jumlah record, loading, dan error.
+- [ ] Integrasikan komponen ke Dasbor Admin.
+- [ ] Tambahkan kontrak JSON tanpa password/token/data sensitif.
+- [ ] Uji dataset valid, dataset invalid, file hilang, dan repository gagal diakses.
 
 ## Verification checklist
-- [ ] Form dapat berpindah antara Guru Tetap, Honor, dan Magang tanpa kehilangan struktur data.
-- [ ] Field data pribadi/kepegawaian dan panel akun guru tampil sesuai referensi.
-- [ ] Password tidak pernah tampil plaintext setelah penyimpanan; reset membutuhkan konfirmasi.
-- [ ] Username unik dan akun tertaut ke profil guru yang benar.
-- [ ] Daftar masing-masing jenis guru menampilkan username dan status masked.
-- [ ] Pengguna non-admin tidak dapat CRUD data guru melalui RLS/backend function.
+- [ ] Admin dapat menekan Sinkronkan dari GitHub dan melihat hasil ringkasan.
+- [ ] Commit SHA yang diproses tercatat di `sync_runs`.
+- [ ] Data valid masuk/upsert ke tabel target tanpa duplikasi.
+- [ ] JSON invalid ditolak sebelum mutation dan error tercatat.
+- [ ] File yang tidak tersedia menghasilkan status gagal yang jelas.
+- [ ] Non-admin tidak dapat menjalankan atau membaca log sinkronisasi.
+- [ ] Tidak ada secret/password dalam response, client code, atau JSON contoh.
 - [ ] `pnpm run check` dan `pnpm run build` berhasil.
