@@ -1,0 +1,38 @@
+create table if not exists public.student_profiles (
+  id uuid primary key default gen_random_uuid(),
+  nis text not null unique,
+  nisn text unique,
+  full_name text not null,
+  class_name text not null,
+  gender text not null default 'Laki-laki',
+  guardian_email text,
+  guardian_phone text,
+  status text not null default 'Aktif',
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now()
+);
+
+create table if not exists public.student_accounts (
+  id uuid primary key default gen_random_uuid(),
+  student_id uuid not null references public.student_profiles(id) on delete cascade,
+  account_type text not null,
+  username text not null unique,
+  auth_user_id uuid,
+  last_password_reset_at timestamptz,
+  created_at timestamptz not null default now(),
+  updated_at timestamptz not null default now(),
+  constraint student_accounts_type_check check (account_type in ('student', 'parent')),
+  constraint student_accounts_student_type_unique unique (student_id, account_type)
+);
+
+alter table public.student_profiles enable row level security;
+alter table public.student_accounts enable row level security;
+
+create policy "admins manage student profiles" on public.student_profiles for all to authenticated using ((auth.jwt() -> 'app_metadata' ->> 'role') = 'admin') with check ((auth.jwt() -> 'app_metadata' ->> 'role') = 'admin');
+create policy "linked users read own student profile" on public.student_profiles for select to authenticated using (exists (select 1 from public.student_accounts a where a.student_id = student_profiles.id and a.auth_user_id = auth.uid()));
+create policy "admins manage student accounts" on public.student_accounts for all to authenticated using ((auth.jwt() -> 'app_metadata' ->> 'role') = 'admin') with check ((auth.jwt() -> 'app_metadata' ->> 'role') = 'admin');
+create policy "linked users read own account" on public.student_accounts for select to authenticated using (auth_user_id = auth.uid());
+
+create index if not exists student_profiles_class_name_idx on public.student_profiles(class_name);
+create index if not exists student_profiles_full_name_idx on public.student_profiles using gin (to_tsvector('simple', full_name));
+create index if not exists student_accounts_student_id_idx on public.student_accounts(student_id);

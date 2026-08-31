@@ -3360,7 +3360,88 @@ export type Database = {
   }
   public: {
     Tables: {
-      [_ in never]: never
+      student_accounts: {
+        Row: {
+          account_type: string
+          auth_user_id: string | null
+          created_at: string
+          id: string
+          last_password_reset_at: string | null
+          student_id: string
+          updated_at: string
+          username: string
+        }
+        Insert: {
+          account_type: string
+          auth_user_id?: string | null
+          created_at?: string
+          id?: string
+          last_password_reset_at?: string | null
+          student_id: string
+          updated_at?: string
+          username: string
+        }
+        Update: {
+          account_type?: string
+          auth_user_id?: string | null
+          created_at?: string
+          id?: string
+          last_password_reset_at?: string | null
+          student_id?: string
+          updated_at?: string
+          username?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "student_accounts_student_id_fkey"
+            columns: ["student_id"]
+            referencedRelation: "student_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      student_profiles: {
+        Row: {
+          class_name: string
+          created_at: string
+          full_name: string
+          gender: string
+          guardian_email: string | null
+          guardian_phone: string | null
+          id: string
+          nis: string
+          nisn: string | null
+          status: string
+          updated_at: string
+        }
+        Insert: {
+          class_name: string
+          created_at?: string
+          full_name: string
+          gender?: string
+          guardian_email?: string | null
+          guardian_phone?: string | null
+          id?: string
+          nis: string
+          nisn?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Update: {
+          class_name?: string
+          created_at?: string
+          full_name?: string
+          gender?: string
+          guardian_email?: string | null
+          guardian_phone?: string | null
+          id?: string
+          nis?: string
+          nisn?: string | null
+          status?: string
+          updated_at?: string
+        }
+        Relationships: []
+      }
     }
     Views: {
       [_ in never]: never

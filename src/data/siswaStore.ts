@@ -1,4 +1,4 @@
-export interface SiswaRecord { kodeSiswa:string; createdAt:string; namaLengkap:string; nis:string; nisn:string; nik:string; tempatLahir:string; tanggalLahir:string; jenisKelamin:string; agama:string; telepon:string; email:string; alamat:string; kota:string; provinsi:string; kelas:string; tahunMasuk:string; namaWali:string; hubunganWali:string; teleponWali:string; status:string; }
+export interface SiswaRecord { kodeSiswa:string; createdAt:string; namaLengkap:string; nis:string; nisn:string; nik:string; tempatLahir:string; tanggalLahir:string; jenisKelamin:string; agama:string; telepon:string; email:string; alamat:string; kota:string; provinsi:string; kelas:string; tahunMasuk:string; namaWali:string; hubunganWali:string; teleponWali:string; usernameSiswa?:string; usernameOrtu?:string; status:string; }
 export const kelasOptions=["VII A","VII B","VIII A","VIII B","IX A","IX B"];
 export const statusOptions=["Aktif","Lulus","Pindah","Keluar"];
 export const hubunganWaliOptions=["Ayah","Ibu","Wali Lainnya"];
