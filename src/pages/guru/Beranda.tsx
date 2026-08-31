@@ -2,6 +2,7 @@ import { useState } from "react";
 import { Bell, BookOpen, CalendarDays, CheckCircle2, ChevronRight, ClipboardList, Clock3, Megaphone, Search, Star, TrendingUp, Users, WalletCards, Zap } from "lucide-react";
 import { defaultProfileData } from "@/data/guruData";
 import TemanAI from "./TemanAI";
+import ScheduleList from "@/components/shared/ScheduleList";
 
 interface BerandaProps { onNavigate: (id: string) => void; }
 
@@ -46,6 +47,7 @@ export default function Beranda({ onNavigate }: BerandaProps) {
     </div>
 
     <section className="relative overflow-hidden rounded-2xl bg-gradient-to-r from-[hsl(var(--guru-sapphire))] via-[hsl(var(--guru-turquoise))] to-[hsl(var(--guru-turquoise-soft))] p-5 text-primary-foreground shadow-lg sm:p-7"><div className="relative z-10 max-w-lg"><p className="text-sm font-medium text-primary-foreground/75">{day}</p><h1 className="mt-1 text-2xl font-black sm:text-3xl">Selamat datang,<br />{defaultProfileData.namaLengkap}.</h1><p className="mt-2 max-w-md text-sm text-primary-foreground/75">Terus dampingi perjalanan belajar siswa SMP kelas 7 dengan pembelajaran Matematika yang bermakna.</p><div className="mt-4 flex flex-wrap gap-2"><span className="rounded-full bg-primary-foreground/15 px-3 py-1.5 text-xs font-semibold">Mengajar Kelas 7</span><span className="rounded-full bg-primary-foreground/15 px-3 py-1.5 text-xs font-semibold">Matematika</span><span className="rounded-full bg-primary-foreground/15 px-3 py-1.5 text-xs font-semibold">{defaultProfileData.unitKerja}</span></div></div><div className="absolute -right-8 -top-16 h-52 w-52 rounded-full border-[28px] border-primary-foreground/10" /><div className="absolute -bottom-24 right-28 h-48 w-48 rounded-full border-[22px] border-[hsl(var(--guru-yellow)/0.45)]" /></section>
+    <ScheduleList title="Jadwal Mengajar" audience="teacher" />
 
     <section className="grid grid-cols-2 gap-3 lg:grid-cols-4">{[["Jumlah Siswa","93","+3% dari bulan lalu",Users,"turquoise"],["Kelas Diampu","3","VII-A, VII-B, VII-C",BookOpen,"sapphire"],["Tugas Aktif","8","3 perlu dinilai",ClipboardList,"yellow"],["Rata-rata Nilai","78,4","+5% dari bulan lalu",Star,"brown"]].map(([label,value,change,Icon,tone])=><div key={String(label)} className={`rounded-2xl border border-border p-4 ${toneClasses[String(tone)]}`}><div className="flex items-center justify-between"><p className="text-xs font-semibold opacity-80">{label}</p><span className="rounded-lg bg-card/60 p-2"><Icon className="h-4 w-4" /></span></div><p className="mt-2 text-2xl font-black text-foreground">{value}</p><p className="mt-1 text-[10px] font-medium opacity-75">{change}</p></div>)}</section>
 
