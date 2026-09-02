@@ -39,7 +39,7 @@ function LoginModal({ role, onClose }: { role: Role; onClose: () => void }) {
     setLoading(true);
     setError("");
     await new Promise((resolve) => window.setTimeout(resolve, 700));
-    if (username !== "hasanhadid" || password !== "hasanhadid68") {
+    if (username !== "mirai" || password !== "miarai123") {
       setError("Username atau kata sandi salah.");
       setLoading(false);
       return;

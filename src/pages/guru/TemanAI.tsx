@@ -59,7 +59,7 @@ export default function TemanAI() {
           </div>
         </div>
         <span className="flex items-center gap-1 rounded-full bg-[hsl(var(--guru-yellow-soft))] px-2.5 py-1 text-[10px] font-semibold text-[hsl(var(--guru-brown))]">
-          <Sparkles className="h-3 w-3" /> Mode Demo
+          <Sparkles className="h-3 w-3" /> UjiBetaversiMIrai
         </span>
       </div>
 
