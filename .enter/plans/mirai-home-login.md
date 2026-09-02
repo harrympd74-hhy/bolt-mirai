@@ -1,44 +1,39 @@
-# Rencana: Ruang Kelas Siswa Terhubung Pertemuan Aktif dan AI Tutor
+# Rencana: Hubungkan Materi Guru ke Jendela Ilmu Siswa
 
 ## Context
-Ruang Kelas siswa perlu mengikuti referensi: breadcrumb kelas/materi, banner materi berwarna, viewer materi guru, tab format, navigasi sebelumnya/selanjutnya, ringkasan pemahaman, dan panel AI Tutor. Materi harus berasal dari link/file yang guru siapkan pada kartu pertemuan aktif; AI Tutor memakai backend yang sudah tersedia.
+Materi & Konten guru sudah tampil dalam tabel, tetapi belum menjadi sumber langsung untuk menu Jendela Ilmu siswa dan belum memiliki edit materi/link yang lengkap. Pengguna meminta guru dapat mengedit materi/link, lalu siswa dapat membaca materi yang berstatus diterbitkan.
 
 ## Pendekatan
-1. Refactor `RuangBelajar`/ruang kelas aktif menjadi `StudentLearningRoom` dengan konteks meeting aktif.
-2. Ambil meeting published yang sedang aktif dari `class-meetings`; pilih material terkait berdasarkan meeting payload. Jika tidak ada materi, tampilkan empty state yang jelas, bukan materi acak.
-3. Tampilkan viewer link/file guru: tombol Word/PDF/PPT/Video, area preview link aman, nama materi, kelas, bab, dan tombol unduh bila URL tersedia.
-4. Tambahkan panel AI Tutor di sisi kanan dengan chat yang memanggil backend function AI Tutor yang sudah ada; fallback UjiBetaversiMIrai hanya jika backend tidak merespons. Tidak menyimpan password/API key di client.
-5. Tambahkan ringkasan pemahaman, latihan soal, kuis, navigasi sebelumnya/selanjutnya, dan CTA bertanya ke AI Tutor dengan data meeting aktif.
+1. Perluas `LearningItem` dengan `meetingId`, `url`, `fileName`, `access`, dan `status`.
+2. Tambahkan operasi `update`, `publish`, dan `remove` pada `learningPlanStore` dengan subscribe perubahan.
+3. Ubah tabel Materi & Konten agar tombol Edit membuka modal yang sama, dan setiap baris menampilkan tombol Terbitkan/Sembunyikan.
+4. Perluas `LearningContentModal` untuk edit judul, kelas, jenis file, akses siswa, deskripsi, link, dan meeting terkait. Validasi URL/link dan ekstensi file.
+5. Buat `StudentKnowledgePage` untuk menu Jendela Ilmu siswa: hanya menampilkan materi type Materi dan status Diterbitkan, dengan search/filter kelas dan tombol Baca/Buka Link.
+6. Pastikan materi yang terbit dapat dipakai pada viewer Ruang Kelas jika memiliki meetingId; data UjiBetaversiMIrai dipakai sebagai fallback tanpa admin.
 
 ## File yang dibuat/diubah
-- `src/pages/siswa/RuangBelajar.tsx`: layout ruang kelas referensi dan viewer materi.
-- `src/components/student/StudentLearningRoom.tsx`: komponen utama ruang belajar.
-- `src/components/student/MaterialViewer.tsx`: preview/link/file material guru.
-- `src/components/student/AITutorPanel.tsx`: panel AI Tutor terhubung backend.
-- `src/components/shared/ActiveStudentClassroom.tsx`: kirim konteks meeting aktif.
-- `src/components/shared/StudentMeetingContent.tsx`: gunakan material meeting aktif.
-
-## Batasan keamanan
-- Hanya material dari meeting published yang aktif dan kelas siswa yang ditampilkan.
-- URL eksternal dibuka dengan `target="_blank"` dan `rel="noreferrer"`.
-- Tidak menyimpan kredensial guru/siswa/provider AI.
-- Fallback lokal diberi label UjiBetaversiMIrai.
+- `src/data/learningPlanStore.ts`: model URL/file/akses, update/publish/remove.
+- `src/components/guru/LearningPlanWorkspace.tsx`: tombol edit, terbitkan, sembunyikan.
+- `src/components/guru/LearningContentModal.tsx`: form create/edit materi/link.
+- `src/pages/siswa/StudentKnowledgePage.tsx`: halaman Jendela Ilmu siswa.
+- `src/pages/SiswaDashboard.tsx`: routing menu Jendela Ilmu.
+- `src/components/shared/StudentMeetingContent.tsx`: memakai material terbit terkait meeting aktif.
 
 ## Implementation checklist
-- [ ] Buat layout ruang kelas dua kolom sesuai referensi.
-- [ ] Hubungkan material/link guru dari meeting aktif.
-- [ ] Tambahkan viewer format Word/PDF/PPT/Video dan link.
-- [ ] Tambahkan breadcrumb, banner materi, navigasi materi, dan ringkasan belajar.
-- [ ] Tambahkan panel AI Tutor dengan backend function yang sudah ada.
-- [ ] Tambahkan fallback UjiBetaversiMIrai jika AI backend gagal.
-- [ ] Hubungkan ruang kelas dari menu siswa dan kartu meeting aktif.
+- [ ] Perluas tipe dan store materi dengan URL, file, akses, meetingId, dan operasi update/publish.
+- [ ] Tambahkan tombol Edit pada tabel Materi & Konten.
+- [ ] Tambahkan tombol Terbitkan/Sembunyikan untuk kontrol visibilitas siswa.
+- [ ] Perluas modal input untuk link materi dan mode edit.
+- [ ] Buat halaman Jendela Ilmu siswa dengan daftar materi terbit dan pencarian.
+- [ ] Hubungkan Jendela Ilmu ke sidebar siswa.
+- [ ] Hubungkan materi terbit ke viewer Ruang Kelas aktif.
 - [ ] Jalankan `pnpm run check` dan `pnpm run build`.
 
 ## Verification checklist
-- [ ] Ruang Kelas menampilkan judul dan materi dari meeting aktif guru yang benar.
-- [ ] Material meeting lain atau draft tidak tampil.
-- [ ] Link guru dapat dibuka dan viewer menampilkan format yang sesuai.
-- [ ] Chat AI Tutor dapat mengirim pertanyaan dan menerima respons.
-- [ ] Fallback UjiBetaversiMIrai muncul saat backend AI tidak merespons.
-- [ ] Navigasi sebelumnya/selanjutnya dan ringkasan belajar berfungsi.
+- [ ] Guru dapat menambah materi/link dari Materi & Konten.
+- [ ] Guru dapat mengedit judul, kelas, link, file, deskripsi, akses, dan meeting terkait.
+- [ ] Materi Draft tidak muncul di Jendela Ilmu siswa.
+- [ ] Setelah diterbitkan, materi muncul di Jendela Ilmu siswa.
+- [ ] Siswa dapat membuka link/materi yang diterbitkan.
+- [ ] Materi terkait meeting aktif tampil di Ruang Kelas.
 - [ ] `pnpm run check` dan `pnpm run build` berhasil.
