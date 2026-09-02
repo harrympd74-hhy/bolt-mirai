@@ -1,40 +1,65 @@
-# Rencana: Revisi Ruang Pertemuan dan Ruang Kelas Siswa
+# Rencana: Membangun Dasbor Siswa MIRAI Final
 
 ## Context
-Dasbor siswa saat ini masih mencampur menu Ruang Pertemuan dengan alur Ruang Kelas aktif. Pengguna meminta Ruang Pertemuan hanya menampilkan daftar kartu pertemuan seperti referensi, sedangkan Ruang Kelas hanya menampilkan pertemuan yang sedang aktif berdasarkan pertemuan yang dibuat/dipublikasikan guru.
+Dokumen `MIRAI_DASBOR_SISWA_FINAL.md` menetapkan blueprint final dasbor siswa dan Productive Struggle: Beranda komunikatif, Card Global Struggle, Ruang Kelas dan Ruang Kolaborasi, alur pengerjaan 5 langkah Warshauer/Pólya, AI Tutor Socratic, serta data skor yang dapat dilihat guru secara agregat/detail sesuai hak akses. Dasbor siswa saat ini masih berisi data demo, menu placeholder, dan tutor berbasis kuis/chat sederhana.
 
 ## Pendekatan
-1. Buat komponen `StudentMeetingCards` yang mengambil data meeting published dari backend `class-meetings` dan menampilkan kartu dua kolom responsif seperti referensi: nomor besar, judul, tanggal/waktu, status, jumlah bahan, dan jumlah tugas.
-2. Pisahkan status siswa menjadi `Selesai`, `Belum Aktif`, dan `Sedang Berlangsung/Akan datang` berdasarkan waktu meeting serta status publikasi. Kartu hanya menjadi daftar informasi dan pintu masuk, tanpa editor atau form guru.
-3. Ubah menu **Ruang Pertemuan** agar membuka halaman kartu tersebut saja.
-4. Buat komponen `ActiveStudentClassroom` yang memfilter meeting published berdasarkan kelas siswa dan hanya menampilkan meeting aktif pada waktu sekarang. Jika tidak ada meeting aktif, tampilkan empty state dengan jadwal pertemuan berikutnya dan tombol kembali.
-5. Ubah menu **Ruang Kelas** agar membuka `ActiveStudentClassroom`, bukan langsung memakai materi demo. Saat kartu meeting aktif dipilih dari Ruang Pertemuan, buka ruang pembelajaran yang sama dengan konteks meeting tersebut.
-6. Pertahankan fallback demo hanya untuk preview tanpa sesi backend; beri label Demo dan jangan mencampurnya dengan data meeting nyata.
+Implementasi dilakukan sebagai satu vertical slice yang dapat diuji end-to-end, tanpa mengubah fitur admin/guru di luar integrasi yang diperlukan:
+
+1. Beranda siswa disusun ulang menjadi header Halo/tanggal/kelas, stat streak-daya juang-poin, kartu kelas hari ini, tugas pending, AI Tutor, jadwal, lanjut belajar, kelompok belajar, jurnal, pencapaian, dan Card Global Problem Struggle. Card siswa hanya menampilkan skor agregat + label positif, tanpa breakdown, nama siswa lain, atau warna merah.
+2. Buat tabel `struggle_steps` dan `struggle_scores` dengan RLS aktif. Simpan event lima langkah, skor aspek 0–100, context type, total score, status, durasi stuck, dan timestamps. Siswa hanya membaca agregat miliknya; guru/admin membaca data sesuai role/kelas.
+3. Implementasikan formula rule-based v1 dari dokumen: percobaan 25%, waktu 20%, inkonsistensi 20%, hint 15%, rata-rata Q/E/G/A 20%. Label siswa mengikuti rentang 0–30, 31–60, 61–85, 86–100 dengan warna hijau/mustard/ungu.
+4. Refactor sesi tutor yang ada menjadi 5 fase berurutan `Question → Encourage → Give Time → Acknowledge → Execute & Check`; fase 1–4 hanya memberi pertanyaan Socratic, bukan jawaban final. Setiap fase memiliki input, tombol petunjuk, timer, dan checklist progres. Mode `classroom` dan `collaboration` dipertahankan pada backend AI Tutor.
+5. Tambahkan Ruang Kolaborasi untuk kelompok belajar/tugas kelompok dan AI Tutor fasilitator/observer; event dicatat sebagai `context_type = collaboration`.
+6. Tambahkan report Struggle guru pada Kehadiran & Nilai dengan filter konteks, status, detail timeline ringkas, dan aksi intervensi. Live alert tetap terpisah dari report.
+7. Buat backend function `struggle-management` untuk start session, append step, calculate score, read student aggregate, dan teacher report. Validasi role/ownership dilakukan server-side.
 
 ## File yang dibuat/diubah
-- `src/components/shared/StudentMeetingCards.tsx`: daftar kartu Ruang Pertemuan sesuai referensi.
-- `src/components/shared/ActiveStudentClassroom.tsx`: filter dan tampilan ruang kelas aktif.
-- `src/pages/SiswaDashboard.tsx`: routing terpisah Ruang Pertemuan vs Ruang Kelas.
-- `src/pages/siswa/RuangKelasAktif.tsx`: menerima konteks meeting aktif bila dipilih.
-- `src/components/shared/StudentMeetingContent.tsx`: tetap dipakai untuk bahan/tugas meeting aktif.
+- `src/pages/SiswaDashboard.tsx`: layout final dan routing menu siswa.
+- `src/pages/siswa/AITutorSession.tsx`: alur 5 fase, timer, prompt Socratic, logging.
+- `src/pages/siswa/CollaborationPage.tsx`: kelompok, tugas kelompok, AI Tutor observer.
+- `src/components/student/StruggleCard.tsx`: Card Global siswa.
+- `src/components/student/WarshauerStepFlow.tsx`: input/progress per fase.
+- `src/components/student/StudentHomeSections.tsx`: kartu tugas/jadwal/jurnal/pencapaian reusable.
+- `src/components/guru/StruggleReport.tsx`: report guru dengan filter `semua/classroom/collaboration`.
+- `src/components/guru/navConfig.ts`: menu siswa dan submenu guru `Kehadiran & Nilai → Struggle`.
+- `src/pages/GuruDashboard.tsx`: routing report Struggle.
+- Migration melalui `supabase_migration`: `struggle_steps`, `struggle_scores`, index, RLS.
+- `supabase/functions/struggle-management/index.ts`: session/step/score/report API.
+- `src/lib/struggleScore.ts`: formula dan label/warna bersama.
+- Generated `src/integrations/supabase/types.ts` hanya diregenerasi otomatis.
+
+## Batasan keamanan dan pedagogis
+- Siswa tidak melihat breakdown per soal, nama siswa lain, ranking, komponen mentah, atau warna merah.
+- AI Tutor tidak memberi jawaban final pada fase Question/Encourage/Give Time/Acknowledge.
+- Guru melihat rincian sesuai kelas/konteks; siswa hanya melihat agregat miliknya.
+- RLS aktif pada setiap tabel baru dalam migration yang sama.
+- Tidak menyimpan password/token dalam log struggle.
+- Mulai dari rule-based scoring v1; klasifikasi model AI tidak ditambahkan pada tahap ini.
 
 ## Implementation checklist
-- [ ] Buat `StudentMeetingCards` dengan layout kartu dua kolom dan status visual sesuai referensi.
-- [ ] Hubungkan kartu ke `class-meetings` dengan mode baca siswa dan filter published.
-- [ ] Pisahkan klik menu `Ruang Pertemuan` ke daftar kartu, tanpa membuka ruang aktif otomatis.
-- [ ] Buat `ActiveStudentClassroom` yang hanya merender meeting aktif berdasarkan waktu sekarang.
-- [ ] Hubungkan menu `Ruang Kelas` ke `ActiveStudentClassroom`.
-- [ ] Tambahkan empty state jika belum ada meeting aktif dan tampilkan meeting terdekat bila tersedia.
-- [ ] Pastikan bahan ajar dan tugas hanya muncul di ruang kelas ketika meeting aktif.
-- [ ] Pertahankan demo fallback dengan label yang jelas.
+- [ ] Buat migration `struggle_steps` dan `struggle_scores` dengan RLS, index, dan policy siswa/guru/admin.
+- [ ] Verifikasi schema/RLS setelah migration.
+- [ ] Buat `src/lib/struggleScore.ts` dengan formula final dan label positif.
+- [ ] Implementasikan backend function `struggle-management` dengan validasi JWT/role/ownership.
+- [ ] Buat Card Global Struggle di Beranda siswa tanpa breakdown sensitif.
+- [ ] Susun ulang Beranda siswa sesuai blueprint tanpa menghilangkan akses jadwal/pertemuan.
+- [ ] Refactor `AITutorSession` menjadi lima fase berurutan dengan timer, input, hint Socratic, dan logging.
+- [ ] Tambahkan mode `classroom` dan `collaboration` pada pemanggilan tutor.
+- [ ] Buat halaman Ruang Kolaborasi dan hubungkan menu siswa.
+- [ ] Tambahkan report Struggle guru dengan filter konteks, status, dan detail timeline ringkas.
+- [ ] Hubungkan report ke `GuruDashboard` tanpa merusak manajemen pertemuan.
 - [ ] Jalankan `pnpm run check` dan `pnpm run build`.
 
 ## Verification checklist
-- [ ] Klik Ruang Pertemuan hanya menampilkan kartu-kartu seperti desain referensi.
-- [ ] Kartu menampilkan nomor, judul, tanggal/waktu, status, jumlah bahan, dan jumlah tugas.
-- [ ] Kartu meeting yang belum waktunya tidak muncul sebagai ruang kelas aktif.
-- [ ] Klik Ruang Kelas menampilkan hanya meeting guru yang sedang berlangsung untuk kelas siswa.
-- [ ] Jika tidak ada meeting aktif, muncul empty state yang informatif.
-- [ ] Bahan ajar dan tugas meeting aktif tampil di Ruang Kelas siswa.
-- [ ] Non-published meeting tidak dapat terlihat oleh siswa melalui backend maupun UI.
+- [ ] Beranda siswa menampilkan Card Global Problem Struggle dengan skor dan label positif.
+- [ ] Skor 0–30, 31–60, 61–85, 86–100 menghasilkan label/warna sesuai spesifikasi dan tidak pernah merah.
+- [ ] Fase tutor hanya dapat dilalui berurutan; fase 1–4 tidak menampilkan jawaban final.
+- [ ] Tombol petunjuk, input refleksi, timer, dan progress fase berfungsi.
+- [ ] Setiap fase tersimpan sebagai event tanpa password/token.
+- [ ] Siswa hanya membaca skor agregat miliknya; query siswa lain ditolak backend/RLS.
+- [ ] Guru dapat memfilter report `Semua`, `Ruang Kelas`, dan `Ruang Kolaborasi`.
+- [ ] Status `Stuck` hanya muncul setelah threshold waktu tanpa progres, bukan hanya skor tinggi.
+- [ ] Ruang Kolaborasi menggunakan mode fasilitator/observer dan context type yang benar.
+- [ ] Jadwal/pertemuan siswa yang sudah dibangun tetap dapat diakses.
 - [ ] `pnpm run check` dan `pnpm run build` berhasil.
