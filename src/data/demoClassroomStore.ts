@@ -1,9 +1,11 @@
 export type DemoMaterial = { id: string; title: string; kind: "link" | "file"; externalUrl?: string; fileUrl?: string; fileName?: string };
 export type DemoAssignment = { id: string; title: string; description?: string };
 export type DemoMeeting = { id: string; meeting_number: number; class_name: string; title: string; starts_at: string; ends_at: string; status: "draft" | "published" | "locked"; meeting_materials: DemoMaterial[]; meeting_assignments: DemoAssignment[] };
-const KEY = "mirai-demo-classroom-v1";
-const listeners = new Set<() => void>();
-const seed: DemoMeeting[] = [{ id: "demo-shared-1", meeting_number: 1, class_name: "VII A", title: "Sudut", starts_at: new Date(Date.now() - 3600000).toISOString(), ends_at: new Date(Date.now() + 3600000).toISOString(), status: "published", meeting_materials: [{ id: "demo-material-1", title: "Video pengantar sudut", kind: "link", externalUrl: "https://www.youtube.com/" }], meeting_assignments: [{ id: "demo-assignment-1", title: "Latihan jenis-jenis sudut", description: "Kerjakan di buku latihan." }] }];
+const KEY = "mirai-classroom-dates-v2";
+const dates = ["2027-03-22", "2027-03-24", "2027-03-29", "2027-03-31", "2027-04-05", "2027-04-07", "2027-04-12", "2027-04-14"];
+const titles = ["Pretest & Prangkat", "Sudut", "Garis-Garis Sejajar", "Kesebangunan pada Segitiga", "Kesebangunan pada Segitiga (2)", "Kesebangunan pada Segi Empat", "Kesebangunan pada Segi Empat (2)", "Posttest & Postangket"];
+const localDate = (date: string, time: string) => new Date(`${date}T${time}:00`).toISOString();
+const seed: DemoMeeting[] = dates.map((date, index) => ({ id: `shared-meeting-${index + 1}`, meeting_number: index + 1, class_name: "VII A", title: titles[index], starts_at: localDate(date, "07:30"), ends_at: localDate(date, "09:00"), status: index < 2 ? "published" : "draft", meeting_materials: index === 1 ? [{ id: "material-sudut", title: "Materi Sudut", kind: "link", externalUrl: "https://www.youtube.com/" }] : [], meeting_assignments: index === 1 ? [{ id: "task-sudut", title: "Latihan Sudut", description: "Kerjakan latihan dari guru." }] : [] }));
 function read(): DemoMeeting[] { try { const raw = localStorage.getItem(KEY); return raw ? JSON.parse(raw) : seed; } catch { return seed; } }
 function write(items: DemoMeeting[]) { localStorage.setItem(KEY, JSON.stringify(items)); listeners.forEach((listener) => listener()); }
 export const demoClassroomStore = { list: read, save(meeting: DemoMeeting) { const items = read(); const next = items.some((item) => item.id === meeting.id) ? items.map((item) => item.id === meeting.id ? meeting : item) : [...items, meeting]; write(next); }, publish(id: string) { write(read().map((item) => item.id === id ? { ...item, status: "published" } : item)); }, subscribe(listener: () => void) { listeners.add(listener); return () => listeners.delete(listener); } };
