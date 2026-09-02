@@ -1,4 +1,4 @@
-export type LearningItem = { id: string; meetingId?: string; title: string; className: string; type: string; status: "Draft" | "Diterbitkan"; description: string; source: string };
+export type LearningItem = { id: string; url?: string; title: string; className: string; type: string; status: "Draft" | "Diterbitkan"; description: string; source: string };
 let items: LearningItem[] = [{ id: "lp-1", title: "Sudut dan Sifatnya", className: "VII-A", type: "Materi", status: "Diterbitkan", description: "Materi pengantar sudut dan latihan dasar.", source: "Pertemuan 01" }, { id: "lp-2", title: "Kuis Sudut Bertolak Belakang", className: "VII-A", type: "Asesmen", status: "Draft", description: "5 soal pilihan ganda.", source: "Asesmen" }, { id: "lp-3", title: "Diskusi Garis Sejajar", className: "VII-B", type: "Kolaboratif", status: "Diterbitkan", description: "Diskusi kelompok dengan papan ide.", source: "Aktivitas Kolaboratif" }];
 const listeners = new Set<() => void>();
 const notify = () => listeners.forEach((listener) => listener());
