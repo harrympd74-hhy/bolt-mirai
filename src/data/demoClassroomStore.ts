@@ -1,0 +1,9 @@
+export type DemoMaterial = { id: string; title: string; kind: "link" | "file"; externalUrl?: string; fileUrl?: string; fileName?: string };
+export type DemoAssignment = { id: string; title: string; description?: string };
+export type DemoMeeting = { id: string; meeting_number: number; class_name: string; title: string; starts_at: string; ends_at: string; status: "draft" | "published" | "locked"; meeting_materials: DemoMaterial[]; meeting_assignments: DemoAssignment[] };
+const KEY = "mirai-demo-classroom-v1";
+const listeners = new Set<() => void>();
+const seed: DemoMeeting[] = [{ id: "demo-shared-1", meeting_number: 1, class_name: "VII A", title: "Sudut", starts_at: new Date(Date.now() - 3600000).toISOString(), ends_at: new Date(Date.now() + 3600000).toISOString(), status: "published", meeting_materials: [{ id: "demo-material-1", title: "Video pengantar sudut", kind: "link", externalUrl: "https://www.youtube.com/" }], meeting_assignments: [{ id: "demo-assignment-1", title: "Latihan jenis-jenis sudut", description: "Kerjakan di buku latihan." }] }];
+function read(): DemoMeeting[] { try { const raw = localStorage.getItem(KEY); return raw ? JSON.parse(raw) : seed; } catch { return seed; } }
+function write(items: DemoMeeting[]) { localStorage.setItem(KEY, JSON.stringify(items)); listeners.forEach((listener) => listener()); }
+export const demoClassroomStore = { list: read, save(meeting: DemoMeeting) { const items = read(); const next = items.some((item) => item.id === meeting.id) ? items.map((item) => item.id === meeting.id ? meeting : item) : [...items, meeting]; write(next); }, publish(id: string) { write(read().map((item) => item.id === id ? { ...item, status: "published" } : item)); }, subscribe(listener: () => void) { listeners.add(listener); return () => listeners.delete(listener); } };
