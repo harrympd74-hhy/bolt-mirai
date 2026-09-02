@@ -1,42 +1,44 @@
-# Rencana: Data UjiBetaversiMIrai pada Dasbor Guru
+# Rencana: Workspace Pembelajaran Guru yang Bisa Diisi Manual
 
 ## Context
-Pengguna meminta submenu Kelas Saya dan seluruh submenu, serta Siswa dan seluruh submenu seperti Semua Siswa, Progress, Kelompok Belajar, dan lainnya, tidak lagi menampilkan placeholder. Semua halaman memakai data UjiBetaversiMIrai yang konsisten dan dapat mengarah ke konteks kelas/siswa yang sama dengan dasbor siswa.
+Menu Pembelajaran guru masih memiliki submenu placeholder. Pengguna meminta guru dapat mengisi manual seluruh isi Pembelajaran, dengan Rencana Pembelajaran berbentuk tabel yang merangkum Pertemuan Kelas, Asesmen, Materi & Konten, AI Tutor, Refleksi Siswa, dan Aktivitas Kolaboratif. Form materi mengikuti referensi: upload file, judul, kelas, jenis file, akses siswa, dan deskripsi.
 
 ## Pendekatan
-1. Buat dataset guru bersama berisi kelas VII-A/VII-B/VII-C, daftar siswa, progres, kelompok, jadwal, dan aktivitas. Dataset hanya data uji non-rahasia.
-2. Buat komponen reusable `TeacherClassWorkspace` untuk semua submenu Kelas Saya: daftar kelas, detail kelas, jadwal, pembuatan kelas uji, dan arsip.
-3. Buat komponen reusable `TeacherStudentWorkspace` untuk semua submenu Siswa: Semua Siswa, Progress & Capaian, Kelompok Belajar, Productive Struggle, dan Tutor Sebaya.
-4. Semua kartu siswa memiliki CTA yang membuka konteks kelas/ruang siswa yang sama; progres dan kelompok memakai IDs/kode siswa yang konsisten dengan dataset siswa.
-5. Pertahankan backend sebagai jalur produksi ketika tersedia, tetapi fallback UjiBetaversiMIrai digunakan saat backend/Auth belum siap. Label UI menggunakan `UjiBetaversiMIrai`, bukan “Demo”.
+1. Buat store UjiBetaversiMIrai untuk rencana pembelajaran dan item pendukung.
+2. Buat `LearningPlanWorkspace` sebagai tabel Rencana Pembelajaran yang menggabungkan data dari submenu pendukung.
+3. Buat `LearningContentModal` dengan dropzone/upload file, judul, kelas, jenis file, akses siswa, deskripsi, dan tombol simpan.
+4. Buat `LearningSubmenuWorkspace` untuk Asesmen, Materi & Konten, AI Tutor, Refleksi Siswa, dan Aktivitas Kolaboratif.
+5. Hubungkan semua submenu Pembelajaran dari `GuruDashboard`. Data yang diterbitkan ke kelas siswa memakai store pembelajaran bersama pada mode UjiBetaversiMIrai; backend tetap dipakai bila Auth tersedia.
 
 ## File yang dibuat/diubah
-- `src/data/teacherBetaversionData.ts`: dataset kelas, siswa, progres, kelompok, jadwal, aktivitas.
-- `src/components/guru/TeacherClassWorkspace.tsx`: halaman Kelas Saya dan subhalaman.
-- `src/components/guru/TeacherStudentWorkspace.tsx`: halaman Siswa dan subhalaman.
-- `src/pages/GuruDashboard.tsx`: routing berdasarkan active ke komponen baru.
-- `src/components/guru/navConfig.ts`: label/submenu tetap konsisten.
-- `src/pages/guru/Beranda.tsx`: CTA kelas/siswa mengarah ke workspace baru bila diperlukan.
+- `src/data/learningPlanStore.ts`
+- `src/components/guru/LearningPlanWorkspace.tsx`
+- `src/components/guru/LearningContentModal.tsx`
+- `src/components/guru/LearningSubmenuWorkspace.tsx`
+- `src/pages/GuruDashboard.tsx`
+- `src/components/shared/StudentMeetingContent.tsx`
 
 ## Batasan
-- Data UjiBetaversiMIrai tidak dianggap data sekolah nyata.
-- Tidak memasukkan password, token, atau secret ke dataset.
-- Fitur backend/Auth tetap dapat menggantikan fallback setelah akun dan koneksi produksi tersedia.
+- Data UjiBetaversiMIrai bukan data produksi.
+- Upload hanya menerima format yang disetujui dan tidak menyimpan password/token.
+- Backend/Auth tetap menjadi sumber produksi bila tersedia.
 
 ## Implementation checklist
-- [ ] Buat dataset UjiBetaversiMIrai kelas, siswa, progres, kelompok, dan jadwal.
-- [ ] Buat workspace Kelas Saya dengan routing daftar/detail/jadwal/buat/arsip.
-- [ ] Buat workspace Siswa dengan routing semua siswa/progress/kelompok/struggle/tutor sebaya.
-- [ ] Tambahkan filter pencarian, kartu ringkasan, dan CTA konteks.
-- [ ] Hubungkan klik siswa ke kelas yang sesuai dan identitas siswa yang sama dengan dasbor siswa.
-- [ ] Ganti semua placeholder terkait submenu Kelas Saya dan Siswa.
+- [ ] Buat store rencana pembelajaran dan item pendukung dengan seed UjiBetaversiMIrai.
+- [ ] Buat tabel Rencana Pembelajaran yang menggabungkan data submenu.
+- [ ] Buat modal input materi sesuai layout referensi.
+- [ ] Validasi file PDF, DOC, DOCX, PPT, PPTX, Video, Image dan batas ukuran.
+- [ ] Buat workspace Asesmen, Materi, AI Tutor, Refleksi, dan Aktivitas Kolaboratif.
+- [ ] Hubungkan semua submenu Pembelajaran dari GuruDashboard.
+- [ ] Hubungkan item yang diterbitkan ke konten siswa.
 - [ ] Jalankan pnpm run check dan pnpm run build.
 
 ## Verification checklist
-- [ ] Semua submenu Kelas Saya membuka halaman berisi data UjiBetaversiMIrai.
-- [ ] Semua submenu Siswa membuka halaman berisi data UjiBetaversiMIrai.
-- [ ] Siswa, kelas, progres, kelompok, dan jadwal konsisten antar halaman.
-- [ ] CTA dari guru mengarah ke konteks kelas/siswa yang benar.
-- [ ] Tidak ada label “Demo” pada UI yang direvisi.
-- [ ] Tidak ada password/token/secret dalam dataset.
+- [ ] Rencana Pembelajaran tampil sebagai tabel dengan kolom submenu pendukung.
+- [ ] Guru dapat menambah dan mengedit baris rencana.
+- [ ] Modal materi memiliki upload/dropzone, judul, kelas, jenis file, akses siswa, deskripsi, dan simpan.
+- [ ] Materi/tugas diterbitkan muncul pada ruang siswa.
+- [ ] Semua submenu Pembelajaran tidak lagi placeholder.
+- [ ] Data dapat diuji tanpa admin dalam mode UjiBetaversiMIrai.
+- [ ] Tidak ada password/token/secret pada store atau UI.
 - [ ] pnpm run check dan pnpm run build berhasil.
