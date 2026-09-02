@@ -1,38 +1,46 @@
-# Rencana: Revisi Pertemuan Kelas Guru
+# Rencana: Panel Teman AI Guru dengan Tautan Eksternal dan Fallback MIRAI
 
 ## Context
-Halaman Pertemuan Kelas guru perlu mengikuti referensi visual: kartu dua kolom, nomor besar, tanggal/waktu, status warna, jumlah bahan/tugas, serta aksi edit. Data kartu harus terhubung dengan Pertemuan, Materi & Konten, Asesmen, Refleksi, dan Aktivitas Kolaboratif.
+Guru meminta Teman AI pada dasbor guru berfungsi seperti mini-browser: menyediakan empat pilihan AI eksternal (GPT, Gemini, DeepSeek, Claude), guru login langsung di situs resmi AI tersebut, dan tidak ada password akun eksternal yang disimpan MIRAI. Jika tautan tidak tersedia atau gagal dibuka, guru tetap memakai Teman AI UjiBetaversiMIrai.
 
 ## Pendekatan
-1. Perluas `learningPlanStore` agar item pembelajaran memiliki `meetingId`, sehingga materi, asesmen, refleksi, dan aktivitas dapat dihitung per pertemuan.
-2. Tambahkan seed delapan pertemuan UjiBetaversiMIrai dengan status dan tanggal sesuai referensi.
-3. Refactor `ClassMeetingsPage` menjadi grid kartu dua kolom dengan warna status `Selesai`, `Belum Aktif`, `Akan datang`, `Sebagian Selesai`, dan `Terkunci`.
-4. Tambahkan modal edit pertemuan yang bisa mengubah nomor, judul, kelas, tanggal, jam, status, dan keterkaitan data pembelajaran.
-5. Kartu menampilkan jumlah bahan dari Materi & Konten, jumlah tugas dari Asesmen, serta indikator refleksi/aktivitas bila tersedia.
-6. Sinkronkan perubahan store ke Rencana Pembelajaran dan konten siswa pada mode UjiBetaversiMIrai; backend tetap dipakai bila data produksi tersedia.
+1. Refactor `TemanAI` menjadi panel workspace dengan kartu empat provider, status tautan, tombol buka di tab baru, dan area percakapan fallback UjiBetaversiMIrai.
+2. Gunakan URL resmi eksternal melalui `window.open`/tautan biasa; jangan iframe login dan jangan menangkap username/password/API key.
+3. Simpan hanya provider terakhir yang dipilih dan riwayat prompt lokal non-rahasia; tidak menyimpan kredensial, token, cookie, atau isi password.
+4. Jika `window.open` diblokir atau URL tidak tersedia, tampilkan pesan dan aktifkan panel UjiBetaversiMIrai sebagai fallback otomatis.
+5. Tetap gunakan backend AI MIRAI yang sudah ada hanya untuk fallback internal, bukan untuk meneruskan kredensial provider eksternal.
 
 ## File yang dibuat/diubah
-- `src/data/learningPlanStore.ts`: relasi meeting dan operasi update.
-- `src/data/classMeetingStore.ts`: delapan seed meeting, status, dan subscribe.
-- `src/pages/guru/ClassMeetingsPage.tsx`: UI kartu referensi, edit, dan relasi submenu.
-- `src/components/guru/LearningPlanWorkspace.tsx`: konsumsi relasi meeting dan agregasi bahan/tugas.
-- `src/components/guru/LearningContentModal.tsx`: menyimpan materi dengan meeting terkait.
-- `src/components/shared/StudentMeetingCards.tsx`: membaca meeting published yang sama.
+- `src/pages/guru/TemanAI.tsx`: provider picker, external links, fallback chat, riwayat lokal aman.
+- `src/components/guru/AIProviderLauncher.tsx`: kartu/link provider reusable bila diperlukan.
+- `src/pages/guru/Beranda.tsx`: tetap memakai TemanAI tanpa mengubah layout dashboard lain.
+
+## Provider
+- GPT: `https://chatgpt.com/`
+- Gemini: `https://gemini.google.com/`
+- DeepSeek: `https://chat.deepseek.com/`
+- Claude: `https://claude.ai/`
+
+## Batasan keamanan
+- Login terjadi langsung di situs provider.
+- MIRAI tidak menyimpan password, API key, access token, cookie, atau data kredensial.
+- Jangan menambahkan provider secret ke frontend atau localStorage.
+- Riwayat lokal dapat dihapus dan diberi label tersimpan di perangkat saat ini.
 
 ## Implementation checklist
-- [ ] Buat store meeting UjiBetaversiMIrai berisi delapan pertemuan sesuai referensi.
-- [ ] Tambahkan relasi `meetingId` pada item pembelajaran dan fungsi update.
-- [ ] Refactor kartu Pertemuan Kelas menjadi grid dua kolom dengan status dan legenda.
-- [ ] Tambahkan modal edit pertemuan dan validasi tanggal/jam.
-- [ ] Hitung jumlah bahan/tugas dari submenu terkait pada setiap kartu.
-- [ ] Sinkronkan perubahan meeting ke Rencana Pembelajaran dan kartu siswa.
+- [ ] Buat kartu empat provider dengan tombol Buka.
+- [ ] Implementasikan pembukaan tautan eksternal di tab baru dengan fallback jika diblokir.
+- [ ] Tambahkan provider aktif dan fallback UjiBetaversiMIrai.
+- [ ] Simpan hanya provider terakhir/riwayat prompt non-rahasia di localStorage.
+- [ ] Tambahkan tombol hapus riwayat lokal.
+- [ ] Pertahankan percakapan fallback Teman AI.
 - [ ] Jalankan `pnpm run check` dan `pnpm run build`.
 
 ## Verification checklist
-- [ ] Delapan kartu tampil dalam pola dua kolom seperti referensi.
-- [ ] Setiap kartu menampilkan nomor, judul, tanggal, jam, status, bahan, dan tugas.
-- [ ] Guru dapat mengedit kartu dan perubahan langsung terlihat di Rencana Pembelajaran.
-- [ ] Menambahkan materi/asesmen pada submenu terkait mengubah jumlah pada kartu.
-- [ ] Meeting published tampil pada dasbor siswa; draft/terkunci tidak dapat dibuka siswa.
-- [ ] Label UI memakai UjiBetaversiMIrai, bukan “Demo”.
+- [ ] Empat tombol provider membuka situs resmi di tab baru.
+- [ ] Tidak ada form login/password provider di MIRAI.
+- [ ] Jika tab diblokir, fallback UjiBetaversiMIrai terlihat dan dapat dipakai.
+- [ ] Provider terakhir dan riwayat prompt dapat dipulihkan pada perangkat yang sama.
+- [ ] Tombol hapus riwayat menghapus data lokal.
+- [ ] Tidak ada secret/token/cookie tersimpan di localStorage.
 - [ ] `pnpm run check` dan `pnpm run build` berhasil.
