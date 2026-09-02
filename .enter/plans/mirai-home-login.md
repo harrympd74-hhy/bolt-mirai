@@ -1,32 +1,31 @@
-# Rencana: Relevansi Status Opsi "Aktif" dan "Tidak Aktif" Pertemuan Kelas
+# Rencana: Latihan Soal Lima Langkah di Ruang Kelas Siswa
 
 ## Context
-Pengguna meminta agar pada kartu Pertemuan Kelas di dasbor guru terdapat opsi pilihan status: **Aktif** dan **Tidak Aktif** (bisa berbentuk dropdown/toggle/tombol opsi) sehingga guru dapat mengaktifkan atau menonaktifkan pertemuan dengan mudah, memperbarui data sesuai kebutuhan, dan menggunakan data tersebut sesuai jadwal.
+Saat siswa menekan kartu **Latihan Soal** pada Ruang Kelas, perlu dibuka halaman latihan sesuai referensi gambar: soal sudut di bagian atas, lima langkah pengerjaan berurutan, area jawaban setiap langkah, dan area Jawaban Akhir.
 
 ## Pendekatan
-1. Di `demoClassroomStore.ts`, tambahkan metode `deactivate(id: string)` yang merubah `status: "draft"` dan `is_active: false`.
-2. Di `ClassMeetingsBoard.tsx`:
-   - Pada setiap kartu pertemuan, sediakan elemen pilihan status **Status Akses**:
-     - `Aktif` (Diterbitkan untuk siswa & live)
-     - `Tidak Aktif` (Draft / disimpan untuk pengeditan)
-   - Bila diset ke `Aktif`, panggil `activate(item)`.
-   - Bila diset ke `Tidak Aktif`, panggil `deactivate(item)`.
-   - Tombol/ikon pengeditan (Pencil) tetap selalu aktif untuk memperbarui judul, tanggal/jam, materi, dan asesmen kapan saja.
-3. Sinkronisasi perubahan status ke dasbor siswa dan kelas aktif secara real-time.
+1. Buat `ProblemSolvingPage` sebagai halaman mandiri dengan tombol kembali ke Ruang Kelas.
+2. Tampilkan soal demo: menentukan besar sudut a, b, dan c dari dua garis berpotongan dengan sudut 60°.
+3. Buat 5 kartu langkah dengan judul, deskripsi instruksi, textarea, warna aksen, dan indikator nomor langkah.
+4. Tambahkan textarea Jawaban Akhir dan tombol Simpan Progres; data jawaban hanya untuk sesi/local state UjiBetaversiMIrai.
+5. Hubungkan tombol Latihan Soal di Ruang Belajar ke halaman baru tanpa mengganggu AI Tutor.
 
-## File yang diubah
-- `src/data/demoClassroomStore.ts`
-- `src/components/guru/ClassMeetingsBoard.tsx`
+## File yang dibuat/diubah
+- `src/pages/siswa/ProblemSolvingPage.tsx`: UI lima langkah sesuai referensi.
+- `src/pages/siswa/RuangBelajar.tsx`: state halaman latihan dan CTA Latihan Soal.
 
 ## Implementation checklist
-- [ ] Tambahkan metode `deactivate` pada `demoClassroomStore`.
-- [ ] Buat kontrol opsi status (`Aktif` / `Tidak Aktif`) pada setiap kartu di `ClassMeetingsBoard`.
-- [ ] Hubungkan perubahan opsi ke `activate` dan `deactivate`.
-- [ ] Pastikan data pertemuan dapat diedit kapan saja dan disinkronkan ke siswa saat diaktifkan.
+- [ ] Buat halaman ProblemSolvingPage dengan soal sudut dan visual diagram.
+- [ ] Buat lima textarea langkah berurutan dengan warna dan ikon.
+- [ ] Tambahkan textarea Jawaban Akhir dan Simpan Progres.
+- [ ] Hubungkan kartu Latihan Soal dari RuangBelajar.
+- [ ] Tambahkan tombol kembali ke Ruang Kelas.
 - [ ] Jalankan `pnpm run check` dan `pnpm run build`.
 
 ## Verification checklist
-- [ ] Kartu pertemuan menampilkan opsi status "Aktif" dan "Tidak Aktif".
-- [ ] Memilih "Tidak Aktif" menonaktifkan pertemuan sehingga bisa diedit tanpa mengganggu siswa.
-- [ ] Memilih "Aktif" mengaktifkan kembali pertemuan sehingga langsung dapat diakses siswa.
+- [ ] Klik Latihan Soal membuka halaman sesuai struktur gambar.
+- [ ] Lima langkah dapat diisi manual.
+- [ ] Jawaban Akhir dapat diisi dan disimpan untuk sesi saat ini.
+- [ ] Tombol kembali mengembalikan siswa ke Ruang Kelas.
+- [ ] Panel AI Tutor tetap berfungsi di Ruang Belajar.
 - [ ] `pnpm run check` dan `pnpm run build` berhasil.
