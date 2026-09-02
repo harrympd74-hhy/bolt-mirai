@@ -1,31 +1,32 @@
-# Rencana: Fitur Aktivasi & Pembatalan (Deaktivasi) Pertemuan Kelas Guru
+# Rencana: Relevansi Status Opsi "Aktif" dan "Tidak Aktif" Pertemuan Kelas
 
 ## Context
-Pengguna meminta agar pada Pertemuan Kelas di dasbor guru terdapat tombol **Aktifkan** dan tombol **Membatalkan (Nonaktifkan)**. Dengan demikian, pertemuan yang aktif dapat dibatalkan kembali ke status belum aktif/draft, diedit/diperbarui oleh guru, dan diaktifkan kembali kapan saja.
+Pengguna meminta agar pada kartu Pertemuan Kelas di dasbor guru terdapat opsi pilihan status: **Aktif** dan **Tidak Aktif** (bisa berbentuk dropdown/toggle/tombol opsi) sehingga guru dapat mengaktifkan atau menonaktifkan pertemuan dengan mudah, memperbarui data sesuai kebutuhan, dan menggunakan data tersebut sesuai jadwal.
 
 ## Pendekatan
-1. Di `demoClassroomStore.ts`, tambahkan metode `deactivate(id: string)` yang mengubah status pertemuan menjadi `draft` dan `is_active: false`.
+1. Di `demoClassroomStore.ts`, tambahkan metode `deactivate(id: string)` yang merubah `status: "draft"` dan `is_active: false`.
 2. Di `ClassMeetingsBoard.tsx`:
-   - Tambahkan tombol **Batalkan Aktivasi** untuk pertemuan yang sedang aktif/diterbitkan.
-   - Saat diklik, panggil pembatalan di `classMeetingStore` dan `demoClassroomStore`.
-   - Pastikan ikon/tombol Edit pensil selalu dapat diakses untuk pertemuan yang dalam status `draft`/`inactive` (serta `published`), sehingga guru dapat dengan mudah memperbarui tanggal/jam, materi, dan asesmen.
-   - Setelah diedit, guru dapat menekan tombol **Aktifkan untuk Siswa** kembali untuk mengaktifkannya lagi.
-3. Pastikan status "Aktif" / "Belum Aktif" pada kartu guru dan dasbor siswa langsung ter-update secara real-time.
+   - Pada setiap kartu pertemuan, sediakan elemen pilihan status **Status Akses**:
+     - `Aktif` (Diterbitkan untuk siswa & live)
+     - `Tidak Aktif` (Draft / disimpan untuk pengeditan)
+   - Bila diset ke `Aktif`, panggil `activate(item)`.
+   - Bila diset ke `Tidak Aktif`, panggil `deactivate(item)`.
+   - Tombol/ikon pengeditan (Pencil) tetap selalu aktif untuk memperbarui judul, tanggal/jam, materi, dan asesmen kapan saja.
+3. Sinkronisasi perubahan status ke dasbor siswa dan kelas aktif secara real-time.
 
 ## File yang diubah
-- `src/data/demoClassroomStore.ts`: Tambahkan metode `deactivate(id)`.
-- `src/components/guru/ClassMeetingsBoard.tsx`: Tambahkan tombol "Batalkan Aktivasi" dan dukung alur edit & re-aktivasi.
+- `src/data/demoClassroomStore.ts`
+- `src/components/guru/ClassMeetingsBoard.tsx`
 
 ## Implementation checklist
 - [ ] Tambahkan metode `deactivate` pada `demoClassroomStore`.
-- [ ] Tambahkan tombol "Batalkan Aktivasi" pada kartu pertemuan yang aktif di `ClassMeetingsBoard`.
-- [ ] Izinkan tombol Edit pensil pada kartu untuk membuka modal pengeditan.
-- [ ] Pastikan setelah pembatalan, status berubah menjadi "Belum Aktif" dan dapat diaktifkan kembali.
+- [ ] Buat kontrol opsi status (`Aktif` / `Tidak Aktif`) pada setiap kartu di `ClassMeetingsBoard`.
+- [ ] Hubungkan perubahan opsi ke `activate` dan `deactivate`.
+- [ ] Pastikan data pertemuan dapat diedit kapan saja dan disinkronkan ke siswa saat diaktifkan.
 - [ ] Jalankan `pnpm run check` dan `pnpm run build`.
 
 ## Verification checklist
-- [ ] Pada pertemuan yang aktif, tombol "Batalkan Aktivasi" tampil.
-- [ ] Menekan tombol "Batalkan Aktivasi" mengubah status menjadi "Belum Aktif".
-- [ ] Pertemuan yang belum aktif dapat diedit (tanggal, materi, asesmen, dsb.).
-- [ ] Pertemuan yang baru diedit dapat diaktifkan kembali dengan tombol "Aktifkan untuk Siswa".
+- [ ] Kartu pertemuan menampilkan opsi status "Aktif" dan "Tidak Aktif".
+- [ ] Memilih "Tidak Aktif" menonaktifkan pertemuan sehingga bisa diedit tanpa mengganggu siswa.
+- [ ] Memilih "Aktif" mengaktifkan kembali pertemuan sehingga langsung dapat diakses siswa.
 - [ ] `pnpm run check` dan `pnpm run build` berhasil.
