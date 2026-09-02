@@ -12,6 +12,7 @@ import ActiveStudentClassroom from "@/components/shared/ActiveStudentClassroom";
 const menuItems = [
   { label: "Beranda", Icon: Home },
   { label: "Jadwal Pelajaran", Icon: Calendar, expandable: true },
+  { label: "Ruang Kelas", Icon: Grid2X2 },
   { label: "Ruang Pertemuan", Icon: Grid2X2 },
   { label: "Jendela Ilmu", Icon: BookOpen },
   { label: "Ruang Kolaborasi", Icon: UsersRound },
