@@ -1,39 +1,36 @@
-# Rencana: Edit Tanggal, Warna, Materi, dan Asesmen Pertemuan
+# Rencana: Tema Dasbor Siswa seperti Referensi MIRAI
 
 ## Context
-Kartu Pertemuan Kelas guru sudah mengikuti pola visual referensi, tetapi editornya belum mengubah tanggal/jam dan belum memilih materi atau asesmen dari submenu terkait. Pengguna meminta kartu dapat diedit seperti referensi serta sumber Bahan dan Tugas berasal dari data yang sudah dibuat di Pembelajaran.
+Dasbor siswa perlu mengikuti referensi visual baru: sidebar biru dengan identitas siswa, header putih, banner sambutan biru, empat kartu statistik berwarna, aktivitas terbaru, dan akses cepat. Data dan interaksi yang ada tetap dipakai, tetapi komposisi Beranda disederhanakan mengikuti pola dashboard referensi.
 
 ## Pendekatan
-1. Tambahkan `accentColor` pada model meeting dan pilihan palet aman: teal, biru, kuning, krem, dan abu-abu; hindari warna gelap, pink, dan ungu.
-2. Perluas modal edit dengan input tanggal, waktu mulai/selesai, warna kartu, dan status.
-3. Tambahkan selector Materi dan Asesmen di modal berdasarkan `learningPlanStore`; item yang dipilih disimpan melalui `meetingId`.
-4. Hitung jumlah Bahan dari item type `Materi` dan jumlah Tugas dari item type `Asesmen` yang memiliki `meetingId` kartu.
-5. Jadikan kartu clickable untuk membuka editor/detail; status locked tetap tidak dapat diedit.
-6. Sinkronkan store sehingga perubahan terlihat di Rencana Pembelajaran dan kartu siswa dalam mode UjiBetaversiMIrai.
+1. Refactor `SiswaDashboard` menjadi shell dashboard dengan sidebar biru, header/topbar putih, dan layout responsif.
+2. Tambahkan menu sidebar: Dashboard/Beranda, Ruang Kelas, Pertemuan Saya, Jendela Ilmu, Ruang Kolaborasi, AI Tutor, Jadwal Saya, Pengaturan, dan Keluar.
+3. Tambahkan banner sambutan siswa dengan identitas kelas/semester.
+4. Tambahkan empat kartu statistik berwarna: Mata Pelajaran, Tugas Aktif, Rata-rata Nilai, dan Kehadiran. Gunakan data siswa yang ada dan tidak menampilkan Card Struggle/Streak/Daya Juang/Total Poin.
+5. Buat panel Aktivitas Terbaru dan Akses Cepat dengan CTA terhubung ke navigasi yang sudah ada.
+6. Pertahankan komponen jadwal/pertemuan dan ruang kelas sebagai halaman internal sidebar.
 
 ## File yang dibuat/diubah
-- `src/data/classMeetingStore.ts`: `accentColor`, operasi update, seed.
-- `src/data/learningPlanStore.ts`: relasi `meetingId`, update item, daftar Materi/Asesmen.
-- `src/components/guru/ClassMeetingsBoard.tsx`: kartu, edit tanggal/jam/warna, selector materi/asesmen.
-- `src/components/guru/LearningContentModal.tsx`: simpan materi ke meeting pilihan.
-- `src/components/guru/LearningPlanWorkspace.tsx`: tampilkan relasi meeting.
-- `src/components/shared/StudentMeetingCards.tsx`: gunakan tanggal/status/warna published yang sama.
+- `src/pages/SiswaDashboard.tsx`: shell dashboard dan beranda referensi.
+- `src/data/siswaDashboardData.ts`: statistik, aktivitas, dan label dashboard bila diperlukan.
+- `src/components/student/StudentSidebar.tsx`: sidebar reusable bila diperlukan.
+- `src/components/student/StudentTopbar.tsx`: topbar reusable bila diperlukan.
 
 ## Implementation checklist
-- [ ] Tambahkan field warna pada meeting dan seed warna aman.
-- [ ] Tambahkan edit tanggal, waktu mulai, waktu selesai, status, dan warna.
-- [ ] Tambahkan pilihan Materi dari submenu Materi & Konten.
-- [ ] Tambahkan pilihan Asesmen dari submenu Asesmen.
-- [ ] Hitung jumlah bahan/tugas per meeting berdasarkan relasi `meetingId`.
-- [ ] Sinkronkan perubahan ke rencana pembelajaran dan kartu siswa.
+- [ ] Buat sidebar biru responsif dengan menu dan highlight aktif.
+- [ ] Buat header putih dengan pencarian, tema, notifikasi, dan keluar.
+- [ ] Buat banner sambutan siswa biru.
+- [ ] Buat empat kartu statistik berwarna sesuai referensi.
+- [ ] Buat panel Aktivitas Terbaru.
+- [ ] Buat panel Akses Cepat dengan CTA berfungsi.
+- [ ] Pastikan halaman Ruang Kelas/Pertemuan/Jendela Ilmu tetap bisa dibuka dari sidebar.
 - [ ] Jalankan `pnpm run check` dan `pnpm run build`.
 
 ## Verification checklist
-- [ ] Guru dapat mengubah tanggal dan jam kartu.
-- [ ] Guru dapat memilih warna kartu dari palet non-gelap/non-pink/non-ungu.
-- [ ] Klik Bahan membuka/menunjukkan materi dari submenu Materi.
-- [ ] Klik Tugas membuka/menunjukkan asesmen dari submenu Asesmen.
-- [ ] Jumlah Bahan/Tugas berubah sesuai item terkait.
-- [ ] Meeting published dengan perubahan yang sama tampil di siswa.
-- [ ] Meeting terkunci tetap tidak dapat diedit.
+- [ ] Tampilan desktop mengikuti struktur referensi: sidebar, topbar, banner, statistik, aktivitas, akses cepat.
+- [ ] Tampilan mobile dapat membuka/menutup sidebar.
+- [ ] Data nama siswa, kelas, tugas, nilai, dan kehadiran tampil konsisten.
+- [ ] Tidak ada Card Problem Struggle, Streak, Daya Juang, atau Total Poin di Beranda.
+- [ ] CTA sidebar dan akses cepat mengubah halaman aktif dengan benar.
 - [ ] `pnpm run check` dan `pnpm run build` berhasil.
