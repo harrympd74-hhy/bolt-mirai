@@ -3613,6 +3613,101 @@ export type Database = {
           },
         ]
       }
+      struggle_scores: {
+        Row: {
+          attempts_score: number
+          context_type: string
+          hint_score: number
+          id: string
+          inconsistency_score: number
+          status: string
+          struggle_score_total: number
+          stuck_duration_sec: number
+          student_id: string
+          time_score: number
+          updated_at: string
+          warshauer_score: number
+        }
+        Insert: {
+          attempts_score?: number
+          context_type?: string
+          hint_score?: number
+          id?: string
+          inconsistency_score?: number
+          status?: string
+          struggle_score_total?: number
+          stuck_duration_sec?: number
+          student_id: string
+          time_score?: number
+          updated_at?: string
+          warshauer_score?: number
+        }
+        Update: {
+          attempts_score?: number
+          context_type?: string
+          hint_score?: number
+          id?: string
+          inconsistency_score?: number
+          status?: string
+          struggle_score_total?: number
+          stuck_duration_sec?: number
+          student_id?: string
+          time_score?: number
+          updated_at?: string
+          warshauer_score?: number
+        }
+        Relationships: [
+          {
+            foreignKeyName: "struggle_scores_student_id_fkey"
+            columns: ["student_id"]
+            referencedRelation: "student_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      struggle_steps: {
+        Row: {
+          aspect: string
+          completed_at: string | null
+          context_type: string
+          created_at: string
+          id: string
+          response: string | null
+          score_aspect: number | null
+          started_at: string | null
+          student_id: string
+        }
+        Insert: {
+          aspect: string
+          completed_at?: string | null
+          context_type: string
+          created_at?: string
+          id?: string
+          response?: string | null
+          score_aspect?: number | null
+          started_at?: string | null
+          student_id: string
+        }
+        Update: {
+          aspect?: string
+          completed_at?: string | null
+          context_type?: string
+          created_at?: string
+          id?: string
+          response?: string | null
+          score_aspect?: number | null
+          started_at?: string | null
+          student_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "struggle_steps_student_id_fkey"
+            columns: ["student_id"]
+            referencedRelation: "student_profiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       student_accounts: {
         Row: {
           account_type: string

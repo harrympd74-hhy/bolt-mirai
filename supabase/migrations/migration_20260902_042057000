@@ -1,0 +1,37 @@
+create table if not exists public.struggle_steps (
+  id uuid primary key default gen_random_uuid(),
+  student_id uuid not null references public.student_profiles(id) on delete cascade,
+  context_type text not null check (context_type in ('classroom','collaboration')),
+  aspect text not null check (aspect in ('question','encourage','give_time','acknowledge','execute_check')),
+  response text,
+  score_aspect integer check (score_aspect between 0 and 100),
+  started_at timestamptz,
+  completed_at timestamptz,
+  created_at timestamptz not null default now()
+);
+create table if not exists public.struggle_scores (
+  id uuid primary key default gen_random_uuid(),
+  student_id uuid not null references public.student_profiles(id) on delete cascade,
+  context_type text not null default 'classroom' check (context_type in ('classroom','collaboration')),
+  attempts_score integer not null default 0 check (attempts_score between 0 and 100),
+  time_score integer not null default 0 check (time_score between 0 and 100),
+  inconsistency_score integer not null default 0 check (inconsistency_score between 0 and 100),
+  hint_score integer not null default 0 check (hint_score between 0 and 100),
+  warshauer_score integer not null default 0 check (warshauer_score between 0 and 100),
+  struggle_score_total integer not null default 0 check (struggle_score_total between 0 and 100),
+  status text not null default 'on_track' check (status in ('on_track','needs_support','stuck')),
+  stuck_duration_sec integer not null default 0,
+  updated_at timestamptz not null default now(),
+  unique(student_id, context_type)
+);
+alter table public.struggle_steps enable row level security;
+alter table public.struggle_scores enable row level security;
+create policy "struggle steps own student read" on public.struggle_steps for select to authenticated using (exists (select 1 from public.student_accounts sa where sa.student_id = struggle_steps.student_id and sa.auth_user_id = auth.uid()));
+create policy "struggle steps teacher admin read" on public.struggle_steps for select to authenticated using ((auth.jwt() -> 'app_metadata' ->> 'role') in ('admin','teacher'));
+create policy "struggle steps student insert" on public.struggle_steps for insert to authenticated with check (exists (select 1 from public.student_accounts sa where sa.student_id = struggle_steps.student_id and sa.auth_user_id = auth.uid()));
+create policy "struggle scores own student read" on public.struggle_scores for select to authenticated using (exists (select 1 from public.student_accounts sa where sa.student_id = struggle_scores.student_id and sa.auth_user_id = auth.uid()));
+create policy "struggle scores teacher admin read" on public.struggle_scores for select to authenticated using ((auth.jwt() -> 'app_metadata' ->> 'role') in ('admin','teacher'));
+create policy "struggle scores student insert" on public.struggle_scores for insert to authenticated with check (exists (select 1 from public.student_accounts sa where sa.student_id = struggle_scores.student_id and sa.auth_user_id = auth.uid()));
+create policy "struggle scores student update" on public.struggle_scores for update to authenticated using (exists (select 1 from public.student_accounts sa where sa.student_id = struggle_scores.student_id and sa.auth_user_id = auth.uid()));
+create index if not exists struggle_steps_student_idx on public.struggle_steps(student_id, context_type, created_at desc);
+create index if not exists struggle_scores_context_idx on public.struggle_scores(context_type, struggle_score_total desc);
