@@ -9,11 +9,10 @@ import { BahanAjarPage, KumpulanSoalPage, KumpulanAngketPage, PersiapanKelasPage
 import { PertemuanKelasPage, SiswaMeetingView } from '@/components/PertemuanKelasPage';
 import type { Teacher, Student } from '@/components/AdminPages';
 import type { Schedule } from '@/types';
-import { Clock, MapPin, BookOpen } from 'lucide-react';
 import { useAuth } from '@/hooks/useAuth';
 import { useAdminDashboardData, useGuruDashboardData, useSiswaDashboardData, useOrtuDashboardData, useTamuDashboardData } from '@/hooks/useDashboardData';
 import {
-  Activity, ArrowRight, BarChart3, Bell, BookOpen, Bot, CalendarDays, ChevronDown,
+  Activity, ArrowRight, BarChart3, Bell, BookOpen, Bot, CalendarDays, ChevronDown, Clock, MapPin,
   CircleUserRound, CreditCard, Eye, EyeOff, FileText, GraduationCap, Images,
   LayoutDashboard, LockKeyhole, LogOut, Menu, Moon, Newspaper, Search,
   Settings, ShieldCheck, Users, X, ClipboardList, Award, TrendingUp,

@@ -535,11 +535,11 @@ export function AiTutorPage() {
     (async () => {
       const { data, error: dbError } = await supabase
         .from('ai_providers')
-        .select('is_active, api_key, expires_at')
+        .select('is_active, expires_at')
         .eq('is_active', true)
         .maybeSingle();
 
-      if (dbError || !data || !data.api_key || data.api_key.trim() === '') {
+      if (dbError || !data) {
         setProviderStatus('unavailable');
         return;
       }
